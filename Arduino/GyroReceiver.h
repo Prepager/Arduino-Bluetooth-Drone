@@ -16,29 +16,29 @@
  */
 class GyroReceiver {
 
-	// Public
-	public:
+    // Public
+    public:
 
-		long accelX, accelY, accelZ;
-		float gForceX, gForceY, gForceZ;
+        long accelX, accelY, accelZ;
+        float gForceX, gForceY, gForceZ;
 
-		long gyroX, gyroY, gyroZ;
-		float rotX, rotY, rotZ;
+        long gyroX, gyroY, gyroZ;
+        float rotX, rotY, rotZ;
 
-		GyroReceiver();
-		void setup();
+        GyroReceiver();
+        void setup();
 
-		void retrieve(bool debugGyro = false, bool debugAccel = false);
-		void outputValues(bool debugGyro = false, bool debugAccel = false);
+        void retrieve(bool debugGyro = false, bool debugAccel = false);
+        void outputValues(bool debugGyro = false, bool debugAccel = false);
 
-	// Protected
-	protected:
+    // Protected
+    protected:
 
-		void retrieveRawAccel();
-		void processRawAccel();
+        void retrieveRawAccel();
+        void processRawAccel();
 
-		void retrieveRawGyro();
-		void processRawGyro();
+        void retrieveRawGyro();
+        void processRawGyro();
 
 };
 
@@ -50,7 +50,7 @@ class GyroReceiver {
  * @returns: void
  */
 GyroReceiver::GyroReceiver() {
-	//
+    //
 }
 
 /*
@@ -61,44 +61,44 @@ GyroReceiver::GyroReceiver() {
  * @returns: void
  */
 void GyroReceiver::setup() {
-	// Begin Wire
-	Wire.begin();
+    // Begin Wire
+    Wire.begin();
 
-	// Begin transmission to MPU address
-	Wire.beginTransmission(0b1101000);
+    // Begin transmission to MPU address
+    Wire.beginTransmission(0b1101000);
 
-		// Access '6.B - Power Management' register
-		Wire.write(0x6B);
+        // Access '6.B - Power Management' register
+        Wire.write(0x6B);
 
-		// Set 'Sleep' register to 0
-		Wire.write(0b00000000);
+        // Set 'Sleep' register to 0
+        Wire.write(0b00000000);
 
-		// End transmission
-		Wire.endTransmission();
+        // End transmission
+        Wire.endTransmission();
 
-	// Begin transmission to MPU address
-	Wire.beginTransmission(0b1101000);
+    // Begin transmission to MPU address
+    Wire.beginTransmission(0b1101000);
 
-		// Access '1.B - Gyroscope Configuration' register
-		Wire.write(0x1B);
+        // Access '1.B - Gyroscope Configuration' register
+        Wire.write(0x1B);
 
-		// Set gyro scale to +/- 250deg./s
-		Wire.write(0x00000000);
+        // Set gyro scale to +/- 250deg./s
+        Wire.write(0x00000000);
 
-		// End transmission
-		Wire.endTransmission();
+        // End transmission
+        Wire.endTransmission();
 
-	// Begin transmission to MPU address
-	Wire.beginTransmission(0b1101000);
+    // Begin transmission to MPU address
+    Wire.beginTransmission(0b1101000);
 
-		// Access '1.C - Acccelerometer Configuration' register
-		Wire.write(0x1C);
-		
-		// Set accel scale to +/- 2g
-		Wire.write(0b00000000);
+        // Access '1.C - Acccelerometer Configuration' register
+        Wire.write(0x1C);
+        
+        // Set accel scale to +/- 2g
+        Wire.write(0b00000000);
 
-		// End transmission
-		Wire.endTransmission();
+        // End transmission
+        Wire.endTransmission();
 }
 
 /*
@@ -109,14 +109,14 @@ void GyroReceiver::setup() {
  * @returns: void
  */
 void GyroReceiver::retrieve(bool debugGyro = false, bool debugAccel = false) {
-	// Retrieve values
-	retrieveRawAccel();
-	retrieveRawGyro();
+    // Retrieve values
+    retrieveRawAccel();
+    retrieveRawGyro();
 
-	// Debug
-	if(debugGyro || debugAccel) {
-		outputValues(debugGyro, debugAccel);
-	}
+    // Debug
+    if(debugGyro || debugAccel) {
+        outputValues(debugGyro, debugAccel);
+    }
 }
 
 /*
@@ -127,28 +127,28 @@ void GyroReceiver::retrieve(bool debugGyro = false, bool debugAccel = false) {
  * @returns: void
  */
 void GyroReceiver::retrieveRawAccel() {
-	// Begin transmission to MPU address
-	Wire.beginTransmission(0b1101000);
+    // Begin transmission to MPU address
+    Wire.beginTransmission(0b1101000);
 
-		// Prepare accel readings
-		Wire.write(0x3B);
+        // Prepare accel readings
+        Wire.write(0x3B);
 
-		// End transmission
-		Wire.endTransmission();
+        // End transmission
+        Wire.endTransmission();
 
-	// Request accel readings
-	Wire.requestFrom(0b1101000, 6);
+    // Request accel readings
+    Wire.requestFrom(0b1101000, 6);
 
-	// Wait for readings
-	while(Wire.available() < 6);
+    // Wait for readings
+    while(Wire.available() < 6);
 
-	// Read raw values x, y and z
-	accelX = Wire.read()<<8|Wire.read();
-	accelY = Wire.read()<<8|Wire.read();
-	accelZ = Wire.read()<<8|Wire.read();
+    // Read raw values x, y and z
+    accelX = Wire.read()<<8|Wire.read();
+    accelY = Wire.read()<<8|Wire.read();
+    accelZ = Wire.read()<<8|Wire.read();
 
-	// Process results
-	processRawAccel();
+    // Process results
+    processRawAccel();
 }
 
 /*
@@ -159,10 +159,10 @@ void GyroReceiver::retrieveRawAccel() {
  * @returns: void
  */
 void GyroReceiver::processRawAccel() {
-	// Divide with 16384 to convert raw +/- 2g range values to g.
-	gForceX = accelX / 16384.0;
-	gForceY = accelY / 16384.0; 
-	gForceZ = accelZ / 16384.0;
+    // Divide with 16384 to convert raw +/- 2g range values to g.
+    gForceX = accelX / 16384.0;
+    gForceY = accelY / 16384.0; 
+    gForceZ = accelZ / 16384.0;
 }
 
 /*
@@ -173,28 +173,28 @@ void GyroReceiver::processRawAccel() {
  * @returns: void
  */
 void GyroReceiver::retrieveRawGyro() {
-	// Begin transmission to MPU address
-	Wire.beginTransmission(0b1101000);
+    // Begin transmission to MPU address
+    Wire.beginTransmission(0b1101000);
 
-		// Prepare gyro readings
-		Wire.write(0x43);
+        // Prepare gyro readings
+        Wire.write(0x43);
 
-		// End transmission
-		Wire.endTransmission();
+        // End transmission
+        Wire.endTransmission();
 
-	// Request gyro readings
-	Wire.requestFrom(0b1101000, 6);
+    // Request gyro readings
+    Wire.requestFrom(0b1101000, 6);
 
-	// Wait for readings
-	while(Wire.available() < 6);
+    // Wait for readings
+    while(Wire.available() < 6);
 
-	// Read raw values x, y and z
-	gyroX = Wire.read()<<8|Wire.read();
-	gyroY = Wire.read()<<8|Wire.read();
-	gyroZ = Wire.read()<<8|Wire.read();
+    // Read raw values x, y and z
+    gyroX = Wire.read()<<8|Wire.read();
+    gyroY = Wire.read()<<8|Wire.read();
+    gyroZ = Wire.read()<<8|Wire.read();
 
-	// Process results
-	processRawGyro();
+    // Process results
+    processRawGyro();
 }
 
 /*
@@ -205,10 +205,10 @@ void GyroReceiver::retrieveRawGyro() {
  * @returns: void
  */
 void GyroReceiver::processRawGyro() {
-	// Divide with 131 to convert raw +/- 250deg./s range values to deg.
-	rotX = gyroX / 131.0;
-	rotY = gyroY / 131.0; 
-	rotZ = gyroZ / 131.0;
+    // Divide with 131 to convert raw +/- 250deg./s range values to deg.
+    rotX = gyroX / 131.0;
+    rotY = gyroY / 131.0; 
+    rotZ = gyroZ / 131.0;
 }
 
 /*
@@ -219,50 +219,50 @@ void GyroReceiver::processRawGyro() {
  * @returns: void
  */
 void GyroReceiver::outputValues(bool debugGyro = false, bool debugAccel = false) {
-	// Output gyro values
-	if(debugGyro)
-	{
-		Serial.print("Gyro (deg)");
+    // Output gyro values
+    if(debugGyro)
+    {
+        Serial.print("Gyro (deg)");
 
-			// Gyro X
-			Serial.print(" X=");
-			if(rotX >= 0) { Serial.print(" "); }
-			Serial.print(rotX);
+            // Gyro X
+            Serial.print(" X=");
+            if(rotX >= 0) { Serial.print(" "); }
+            Serial.print(rotX);
 
-			// Gyro Y
-			Serial.print(" Y=");
-			if(rotY >= 0) { Serial.print(" "); }
-			Serial.print(rotY);
+            // Gyro Y
+            Serial.print(" Y=");
+            if(rotY >= 0) { Serial.print(" "); }
+            Serial.print(rotY);
 
-			// Gyro Z
-			Serial.print(" Z=");
-			if(rotZ >= 0) { Serial.print(" "); }
-			Serial.print(rotZ);
+            // Gyro Z
+            Serial.print(" Z=");
+            if(rotZ >= 0) { Serial.print(" "); }
+            Serial.print(rotZ);
 
-			// Only gyro
-			if(!debugAccel) {
-				Serial.println();
-			}
-	}
+            // Only gyro
+            if(!debugAccel) {
+                Serial.println();
+            }
+    }
 
-	// Output accelerometer values
-	if(debugAccel)
-	{
-		Serial.print(" Accel (g)");
+    // Output accelerometer values
+    if(debugAccel)
+    {
+        Serial.print(" Accel (g)");
 
-			// Accelerometer X
-			Serial.print(" X=");
-			if(gForceX >= 0) { Serial.print(" "); }
-			Serial.print(gForceX);
+            // Accelerometer X
+            Serial.print(" X=");
+            if(gForceX >= 0) { Serial.print(" "); }
+            Serial.print(gForceX);
 
-			// Accelerometer Y
-			Serial.print(" Y=");
-			if(gForceY >= 0) { Serial.print(" "); }
-			Serial.print(gForceY);
+            // Accelerometer Y
+            Serial.print(" Y=");
+            if(gForceY >= 0) { Serial.print(" "); }
+            Serial.print(gForceY);
 
-			// Accelerometer Z
-			Serial.print(" Z=");
-			if(gForceZ >= 0) { Serial.print(" "); }
-			Serial.println(gForceZ);
-	}
+            // Accelerometer Z
+            Serial.print(" Z=");
+            if(gForceZ >= 0) { Serial.print(" "); }
+            Serial.println(gForceZ);
+    }
 }

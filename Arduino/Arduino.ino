@@ -27,25 +27,25 @@ GyroReceiver gyro;
  * @returns: void
  */
 void setup() {
-	// Begin serial in debugging
-	if(DEBUG) {
-		Serial.begin(9600);
-		debug("-- Debugging initialized --");
-		debug("");
-	}
+    // Begin serial in debugging
+    if(DEBUG) {
+        Serial.begin(9600);
+        debug("-- Debugging initialized --");
+        debug("");
+    }
 
-	// Setup Gyro module
-	gyro.setup();
-	debug("+ Gyro initialized.");
+    // Setup Gyro module
+    gyro.setup();
+    debug("+ Gyro initialized.");
 
-	// Setup Bluetooth module
-	// X
-	debug("+ Bluetooth initialized.");
+    // Setup Bluetooth module
+    // X
+    debug("+ Bluetooth initialized.");
 
-	// Completed
-	debug("");
-	debug("-- Setup Completed --");
-	debug("");
+    // Completed
+    debug("");
+    debug("-- Setup Completed --");
+    debug("");
 }
 
 /*
@@ -56,9 +56,9 @@ void setup() {
  * @returns: void
  */
 void debug(String text) {
-	if(DEBUG) {
-		Serial.println(text);
-	}
+    if(DEBUG) {
+        Serial.println(text);
+    }
 }
 
 /*
@@ -69,6 +69,6 @@ void debug(String text) {
  * @returns: void
  */
 void loop() {
-	// Retrieve gyro readings
-	gyro.retrieve(DEBUG && DEBUG_GYRO, DEBUG && DEBUG_ACCEL);
+    // Retrieve gyro readings
+    gyro.retrieve(DEBUG && DEBUG_GYRO, DEBUG && DEBUG_ACCEL);
 }
