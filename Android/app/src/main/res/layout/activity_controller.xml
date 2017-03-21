@@ -1,50 +1,148 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.zapsterstudios.android.Controller">
 
-    <GridLayout
-        android:layout_width="576dp"
-        android:layout_height="295dp"
-        android:padding="8dp"
-        tools:layout_editor_absoluteX="8dp"
-        tools:layout_editor_absoluteY="8dp">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true">
 
         <TextView
-            android:id="@+id/textSpeed"
-            android:layout_width="wrap_content"
+            android:id="@+id/textView"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginTop="16dp"
             android:text="Movement Speed"
-            android:textSize="16sp"
+            android:textSize="18sp"
             android:textStyle="bold" />
 
         <SeekBar
-            android:id="@+id/seekBar6"
+            android:id="@+id/seekBar"
             android:layout_width="match_parent"
-            android:layout_height="34dp"
-            android:layout_column="0"
-            android:layout_row="1" />
+            android:layout_height="32dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp" />
 
         <View
+            android:id="@+id/dividerHorizontal"
             android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_column="0"
-            android:layout_marginBottom="8dp"
-            android:layout_marginTop="8dp"
-            android:layout_row="2"
-            android:background="@android:color/darker_gray" />
+            android:layout_height="2dp"
+            android:layout_marginTop="16dp"
+            android:foreground="?attr/colorButtonNormal" />
 
-        <Button
-            android:id="@+id/button5"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Button"
-            android:layout_column="0"
-            android:layout_row="3" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal" >
 
-    </GridLayout>
+            <RelativeLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:padding="12dp">
 
-</android.support.constraint.ConstraintLayout>
+                <Button
+                    android:id="@+id/btnTurnRight"
+                    style="@style/Widget.AppCompat.Button.Colored"
+                    android:layout_width="60dp"
+                    android:layout_height="150dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignTop="@+id/btnTurnLeft"
+                    android:layout_toEndOf="@+id/btnBackwards"
+                    android:text="Turn Right" />
+
+                <Button
+                    android:id="@+id/btnTurnLeft"
+                    style="@style/Widget.AppCompat.Button.Colored"
+                    android:layout_width="60dp"
+                    android:layout_height="150dp"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"
+                    android:layout_toStartOf="@+id/btnBackwards"
+                    android:text="Turn Left" />
+
+                <Button
+                    android:id="@+id/btnBackwards"
+                    style="@style/Widget.AppCompat.Button.Colored"
+                    android:layout_width="140dp"
+                    android:layout_height="60dp"
+                    android:layout_alignParentBottom="true"
+                    android:layout_alignStart="@+id/btnForward"
+                    android:text="Backwards" />
+
+                <Button
+                    android:id="@+id/btnForward"
+                    style="@style/Widget.AppCompat.Button.Colored"
+                    android:layout_width="140dp"
+                    android:layout_height="60dp"
+                    android:layout_alignParentTop="true"
+                    android:layout_centerHorizontal="true"
+                    android:text="Forward" />
+            </RelativeLayout>
+
+            <View
+                android:id="@+id/verticalHorizontal"
+                android:layout_width="2dp"
+                android:layout_height="match_parent"
+                android:foreground="?attr/colorButtonNormal" />
+
+            <RelativeLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:padding="12dp">
+
+                <Button
+                    android:id="@+id/button6"
+                    style="@style/Widget.AppCompat.Button.Colored"
+                    android:layout_width="60dp"
+                    android:layout_height="150dp"
+                    android:text="Rotate Right"
+                    android:textSize="14sp"
+                    android:layout_alignTop="@+id/button7"
+                    android:layout_alignParentEnd="true"
+                    android:layout_toEndOf="@+id/btnDown" />
+
+                <Button
+                    android:id="@+id/button7"
+                    style="@style/Widget.AppCompat.Button.Colored"
+                    android:layout_width="60dp"
+                    android:layout_height="150dp"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"
+                    android:layout_toStartOf="@+id/btnDown"
+                    android:text="Rotate Left"
+                    android:textSize="14sp" />
+
+                <Button
+                    android:id="@+id/btnDown"
+                    style="@style/Widget.AppCompat.Button.Colored"
+                    android:layout_width="140dp"
+                    android:layout_height="60dp"
+                    android:layout_alignParentBottom="true"
+                    android:layout_alignStart="@+id/btnUp"
+                    android:text="Down" />
+
+                <Button
+                    android:id="@+id/btnUp"
+                    style="@style/Widget.AppCompat.Button.Colored"
+                    android:layout_width="140dp"
+                    android:layout_height="60dp"
+                    android:layout_alignParentTop="true"
+                    android:layout_centerHorizontal="true"
+                    android:text="Up" />
+            </RelativeLayout>
+        </LinearLayout>
+
+    </LinearLayout>
+
+</RelativeLayout>
