@@ -248,7 +248,11 @@ void GyroReceiver::outputValues(bool debugGyro = false, bool debugAccel = false)
     // Output accelerometer values
     if(debugAccel)
     {
-        Serial.print(" Accel (g)");
+        if(debugGyro) {
+            Serial.print(" Accel (g)");
+        }else{
+            Serial.print("Accel (g)");
+        }
 
             // Accelerometer X
             Serial.print(" X=");

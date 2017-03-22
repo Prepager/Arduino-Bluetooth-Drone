@@ -26,11 +26,13 @@
             android:textStyle="bold" />
 
         <SeekBar
-            android:id="@+id/seekBar"
+            android:id="@+id/movementSpeed"
             android:layout_width="match_parent"
             android:layout_height="32dp"
             android:layout_marginLeft="8dp"
-            android:layout_marginRight="8dp" />
+            android:layout_marginRight="8dp"
+            android:max="9"
+            android:progress="1" />
 
         <View
             android:id="@+id/dividerHorizontal"
@@ -102,18 +104,18 @@
                 android:padding="12dp">
 
                 <Button
-                    android:id="@+id/button6"
+                    android:id="@+id/btnRotateRight"
                     style="@style/Widget.AppCompat.Button.Colored"
                     android:layout_width="60dp"
                     android:layout_height="150dp"
-                    android:text="Rotate Right"
-                    android:textSize="14sp"
-                    android:layout_alignTop="@+id/button7"
                     android:layout_alignParentEnd="true"
-                    android:layout_toEndOf="@+id/btnDown" />
+                    android:layout_alignTop="@+id/btnRotateLeft"
+                    android:layout_toEndOf="@+id/btnDown"
+                    android:text="Rotate Right"
+                    android:textSize="14sp" />
 
                 <Button
-                    android:id="@+id/button7"
+                    android:id="@+id/btnRotateLeft"
                     style="@style/Widget.AppCompat.Button.Colored"
                     android:layout_width="60dp"
                     android:layout_height="150dp"

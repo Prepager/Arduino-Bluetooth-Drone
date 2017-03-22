@@ -12,17 +12,21 @@
 
 // Settings - Bluetooth
 #define BLUETOOTH_SERIAL false
+#define BLUETOOTH_ALIVE 3
 
 // Includes
+#include "Helpers.h";
 #include "GyroReceiver.h";
+#include "BluetoothReceiver.h";
 
 // Classes
 GyroReceiver gyro;
+BluetoothReceiver bluetooth(10, 11);
 
 /*
  * Function: setup
  * ----------------------------
- * Setup function for Arduino (Run once)
+ * Setup function for Arduino (Run once).
  *
  * @returns: void
  */
@@ -39,7 +43,7 @@ void setup() {
     debug("+ Gyro initialized.");
 
     // Setup Bluetooth module
-    // X
+    bluetooth.setup(BLUETOOTH_ALIVE);
     debug("+ Bluetooth initialized.");
 
     // Completed
@@ -49,26 +53,16 @@ void setup() {
 }
 
 /*
- * Function: debug
- * ----------------------------
- * Output string to Serial on debug
- *
- * @returns: void
- */
-void debug(String text) {
-    if(DEBUG) {
-        Serial.println(text);
-    }
-}
-
-/*
  * Function: loop
  * ----------------------------
- * Loop function for Arduino (Run every tick)
+ * Loop function for Arduino (Run every tick).
  *
  * @returns: void
  */
 void loop() {
     // Retrieve gyro readings
     gyro.retrieve(DEBUG && DEBUG_GYRO, DEBUG && DEBUG_ACCEL);
+    
+    // Retrieve bluetooth readings
+    bluetooth.retrieve(DEBUG && DEBUG_BLUETOOTH);
 }
