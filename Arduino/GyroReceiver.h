@@ -4,8 +4,11 @@
 //        Andreas, Jesper og Marcus - 3C        \\
 //----------------------------------------------\\
 
+// Prevent double inclusion
+#pragma once
+
 // Dependencies
-#include <Wire.h>
+#include "Wire.h";
 
 /*
  * Class: GyroReceiver
@@ -19,27 +22,26 @@ class GyroReceiver {
     // Public
     public:
 
+        bool debugGyro, debugAccel;
+
         long accelX, accelY, accelZ;
         float gForceX, gForceY, gForceZ;
 
         long gyroX, gyroY, gyroZ;
         float rotX, rotY, rotZ;
 
-        GyroReceiver();
+        GyroReceiver(bool gyro = false, bool accel = false);
         void setup();
 
-        void retrieve(bool debugGyro = false, bool debugAccel = false);
-        void outputValues(bool debugGyro = false, bool debugAccel = false);
-
-    // Protected
-    protected:
+        void retrieve();
+        void outputValues();
 
         void retrieveRawAccel();
         void processRawAccel();
 
         void retrieveRawGyro();
         void processRawGyro();
-
+    
 };
 
 /*
@@ -49,8 +51,10 @@ class GyroReceiver {
  *
  * @returns: void
  */
-GyroReceiver::GyroReceiver() {
-    //
+GyroReceiver::GyroReceiver(bool gyro = false, bool accel = false) {
+    // Debug
+    debugGyro = gyro;
+    debugAccel = accel;
 }
 
 /*
@@ -108,14 +112,14 @@ void GyroReceiver::setup() {
  *
  * @returns: void
  */
-void GyroReceiver::retrieve(bool debugGyro = false, bool debugAccel = false) {
+void GyroReceiver::retrieve() {
     // Retrieve values
     retrieveRawAccel();
     retrieveRawGyro();
 
     // Debug
     if(debugGyro || debugAccel) {
-        outputValues(debugGyro, debugAccel);
+        outputValues();
     }
 }
 
@@ -218,7 +222,7 @@ void GyroReceiver::processRawGyro() {
  *
  * @returns: void
  */
-void GyroReceiver::outputValues(bool debugGyro = false, bool debugAccel = false) {
+void GyroReceiver::outputValues() {
     // Output gyro values
     if(debugGyro)
     {

@@ -4,8 +4,11 @@
 //        Andreas, Jesper og Marcus - 3C        \\
 //----------------------------------------------\\
 
+// Prevent double inclusion
+#pragma once
+
 // Dependencies
-#include <SoftwareSerial.h>
+#include "SoftwareSerial.h";
 
 /*
  * Class: BluetoothReceiver
@@ -19,6 +22,8 @@ class BluetoothReceiver {
     // Public
     public:
 
+        bool debugBluetooth;
+
         int tx, rx;
         char command;
 
@@ -27,16 +32,11 @@ class BluetoothReceiver {
 
         SoftwareSerial * bluetoothSerial;
 
-        BluetoothReceiver(int pinTX, int pinRX);
-        void setup(int aliveTime);
+        BluetoothReceiver(int pinTX, int pinRX, bool debug, int alive = 2);
+        void setup();
 
-        void retrieve(bool debugBluetooth = false);
+        void retrieve();
         bool isAlive();
-
-    // Protected
-    protected:
-
-        //
 
 };
 
@@ -47,10 +47,12 @@ class BluetoothReceiver {
  *
  * @returns: void
  */
-BluetoothReceiver::BluetoothReceiver(int pinTX, int pinRX) {
-    // Save ports
+BluetoothReceiver::BluetoothReceiver(int pinTX, int pinRX, bool debug, int alive = 2) {
+    // Variables
     tx = pinTX;
     rx = pinRX;
+    debugBluetooth = debug;
+    aliveLength = alive;
 
     // Open software serial
     bluetoothSerial = new SoftwareSerial(pinTX, pinRX);
@@ -63,10 +65,9 @@ BluetoothReceiver::BluetoothReceiver(int pinTX, int pinRX) {
  *
  * @returns: void
  */
-void BluetoothReceiver::setup(int aliveTime = 2) {
+void BluetoothReceiver::setup() {
     // Reset alive
     lastAlive = millis();
-    aliveLength = aliveTime;
 
     // Begin serial
     bluetoothSerial->begin(9600);
@@ -79,7 +80,7 @@ void BluetoothReceiver::setup(int aliveTime = 2) {
  *
  * @returns: void
  */
-void BluetoothReceiver::retrieve(bool debugBluetooth = false) {
+void BluetoothReceiver::retrieve() {
     // Bluetooth available
     if(bluetoothSerial->available()) {
         // Read Bluetooth signal
@@ -94,16 +95,17 @@ void BluetoothReceiver::retrieve(bool debugBluetooth = false) {
         command = 'Z';
     }
 
-    // Debug
-    if(debugBluetooth) {
-        Serial.println(command);
+    // Output debug command
+    if(debugBluetooth && command != 'Z' && command != 'X') {
+        Serial.print("Bluetooth Signal: ");
+        Serial.println(String(command));
     }
 }
 
 /*
  * Function: isAlive
  * ----------------------------
- * Check bluetooth alive
+ * Check bluetooth alive.
  *
  * @returns: bool
  */

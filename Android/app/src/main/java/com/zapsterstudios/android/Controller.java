@@ -1,17 +1,16 @@
 package com.zapsterstudios.android;
 
 import android.content.Context;
-import android.content.pm.ActivityInfo;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Vibrator;
+import android.util.Log;
 import android.view.View;
 import android.view.MotionEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.WindowManager;
 import android.widget.Toast;
 import android.widget.Button;
 import android.widget.SeekBar;
@@ -51,17 +50,15 @@ public class Controller extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        // Create view
+        // On created
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_controller);
-
-        // Force landscape rotation
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 
         // Retrieve address
         Intent newint = getIntent();
         address = newint.getStringExtra(DeviceList.EXTRA_ADDRESS);
+
+        // Create view
+        setContentView(R.layout.activity_controller);
 
         // Connect to Bluetooth
         new ConnectBT().execute();
@@ -209,15 +206,13 @@ public class Controller extends AppCompatActivity {
     }
 
     private void sendBluetoothSignal(String signal) {
-        if (btSocket!=null)
+        if(btSocket != null)
         {
             try
             {
-                btSocket.getOutputStream().write(signal.getBytes());
-            }
-            catch (IOException e)
-            {
-                Toast.makeText(getApplicationContext(), "Couldn't send signal.", Toast.LENGTH_LONG).show();
+                btSocket.getOutputStream().write(signal.toString().getBytes());
+            } catch (IOException e) {
+                //Toast.makeText(getApplicationContext(), "Couldn't send signal.", Toast.LENGTH_LONG).show();
             }
         }
     }
@@ -299,6 +294,7 @@ public class Controller extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(), "Connected!", Toast.LENGTH_LONG).show();
                 isBtConnected = true;
             }
+
             progress.dismiss();
         }
     }

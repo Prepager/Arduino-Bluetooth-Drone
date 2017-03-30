@@ -5,6 +5,17 @@
 //----------------------------------------------\\
 
 /*
+ * Function: isDebug
+ * ----------------------------
+ * Return weather or not the variable is in debug.
+ *
+ * @returns: bool
+ */
+bool isDebug(bool debugVariable) {
+    return DEBUG && debugVariable;
+}
+
+/*
  * Function: debug
  * ----------------------------
  * Output string to Serial on debug.

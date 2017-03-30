@@ -9,19 +9,31 @@
 #define DEBUG_GYRO false
 #define DEBUG_ACCEL false
 #define DEBUG_BLUETOOTH true
+#define DEBUG_CONTROLLER true
 
 // Settings - Bluetooth
-#define BLUETOOTH_SERIAL false
 #define BLUETOOTH_ALIVE 3
 
-// Includes
-#include "Helpers.h";
-#include "GyroReceiver.h";
-#include "BluetoothReceiver.h";
+// Motor Controllers
+#include "MotorController.h";
+extern MotorController motorFrontLeft(9);
+extern MotorController motorFrontRight(10);
+extern MotorController motorBackLeft(3);
+extern MotorController motorBackRight(11);
 
-// Classes
-GyroReceiver gyro;
-BluetoothReceiver bluetooth(10, 11);
+// Other Dependencies
+#include "Helpers.h";
+
+// Receivers
+#include "GyroReceiver.h";
+GyroReceiver gyro(isDebug(DEBUG_GYRO), isDebug(DEBUG_ACCEL));
+
+#include "BluetoothReceiver.h";
+BluetoothReceiver bluetooth(5, 6, isDebug(DEBUG_BLUETOOTH), BLUETOOTH_ALIVE);
+
+// Speed Controller
+#include "SpeedController.h";
+SpeedController speedController(isDebug(DEBUG_CONTROLLER));
 
 /*
  * Function: setup
@@ -43,8 +55,19 @@ void setup() {
     debug("+ Gyro initialized.");
 
     // Setup Bluetooth module
-    bluetooth.setup(BLUETOOTH_ALIVE);
+    bluetooth.setup();
     debug("+ Bluetooth initialized.");
+
+    // Setup Motor Controller module
+    speedController.frontLeft = &motorFrontLeft;
+    speedController.frontRight = &motorFrontRight;
+    speedController.backLeft = &motorBackLeft;
+    speedController.backRight = &motorBackRight;
+    debug("+ Motor Controllers initialized.");
+
+    // Setup Speed Controller module
+    speedController.setup();
+    debug("+ Speed Controller initialized.");
 
     // Completed
     debug("");
@@ -60,9 +83,12 @@ void setup() {
  * @returns: void
  */
 void loop() {
-    // Retrieve gyro readings
-    gyro.retrieve(DEBUG && DEBUG_GYRO, DEBUG && DEBUG_ACCEL);
+    // Retrieve Gyro readings
+    //gyro.retrieve();
     
-    // Retrieve bluetooth readings
-    bluetooth.retrieve(DEBUG && DEBUG_BLUETOOTH);
+    // Retrieve Bluetooth readings
+    //bluetooth.retrieve();
+
+    // Handle Speed Controller
+    speedController.handle(gyro, bluetooth);
 }
