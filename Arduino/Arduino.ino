@@ -6,34 +6,50 @@
 
 // Settings - Debug
 #define DEBUG true
-#define DEBUG_GYRO false
-#define DEBUG_ACCEL false
-#define DEBUG_BLUETOOTH true
-#define DEBUG_CONTROLLER true
 
 // Settings - Bluetooth
+#define DEBUG_BLUETOOTH true
+#define BLUETOOTH_ENABLED false
+#define BLUETOOTH_SETUP false
 #define BLUETOOTH_ALIVE 3
+
+// Settings - Gyro
+#define DEBUG_GYRO false
+#define DEBUG_ACCEL false
+#define GYRO_ENABLED true
+#define GYRO_CALIBRATE false
+
+// Settings - Controller
+#define DEBUG_CONTROLLER true
+#define CTLR_ENABLED true
+#define CTLR_SPEED_RANGE 255
+#define CTLR_LAUNCH_FORCE 10
+#define CTLR_INVERSE_SPEED 200
+#define CTLR_BALANCE_FORCE 0.10
+#define CTLR_BALANCE_TIMER 8000
+#define CTLR_BALANCE_MULTIPLIER 80
 
 // Motor Controllers
 #include "MotorController.h";
-extern MotorController motorFrontLeft(9);
-extern MotorController motorFrontRight(10);
-extern MotorController motorBackLeft(3);
-extern MotorController motorBackRight(11);
+extern MotorController motorFrontLeft(1, 9);
+extern MotorController motorFrontRight(2, 11);
+extern MotorController motorBackLeft(3, 10);
+extern MotorController motorBackRight(4, 3);
 
-// Other Dependencies
+// Helper Dependencies
 #include "Helpers.h";
 
-// Receivers
+// Gyro Receiver
 #include "GyroReceiver.h";
-GyroReceiver gyro(isDebug(DEBUG_GYRO), isDebug(DEBUG_ACCEL));
+extern GyroReceiver gyro(isDebug(DEBUG_GYRO), isDebug(DEBUG_ACCEL));
 
+// Bluetooth Receiver
 #include "BluetoothReceiver.h";
-BluetoothReceiver bluetooth(5, 6, isDebug(DEBUG_BLUETOOTH), BLUETOOTH_ALIVE);
+extern BluetoothReceiver bluetooth(5, 6, isDebug(DEBUG_BLUETOOTH));
 
 // Speed Controller
 #include "SpeedController.h";
-SpeedController speedController(isDebug(DEBUG_CONTROLLER));
+extern SpeedController speedController(isDebug(DEBUG_CONTROLLER));
 
 /*
  * Function: setup
@@ -46,28 +62,42 @@ void setup() {
     // Begin serial in debugging
     if(DEBUG) {
         Serial.begin(9600);
-        debug("-- Debugging initialized --");
+        debug("-- Debug Started --");
         debug("");
+
+        debug("+ Debugging initialized.");
+    }
+
+    // Setup Bluetooth module
+    if(BLUETOOTH_ENABLED) {
+        bluetooth.setup();
+        debug("+ Bluetooth initialized.");
     }
 
     // Setup Gyro module
-    gyro.setup();
-    debug("+ Gyro initialized.");
+    if(GYRO_ENABLED) {
+        // Setup Gyro
+        delay(1000);
+        gyro.setup();
+        debug("+ Gyro initialized.");
 
-    // Setup Bluetooth module
-    bluetooth.setup();
-    debug("+ Bluetooth initialized.");
+        // Should calibrate
+        if(GYRO_CALIBRATE) {
+            // Send calibration warning
+            debug("+ Gyro calibration starting in 2 seconds.");
+            delay(2000);
 
-    // Setup Motor Controller module
-    speedController.frontLeft = &motorFrontLeft;
-    speedController.frontRight = &motorFrontRight;
-    speedController.backLeft = &motorBackLeft;
-    speedController.backRight = &motorBackRight;
-    debug("+ Motor Controllers initialized.");
+            // Calibrate Gyro
+            gyro.calibrate();
+            debug("+ Gyro calibrated.");
+        }
+    }
 
     // Setup Speed Controller module
-    speedController.setup();
-    debug("+ Speed Controller initialized.");
+    if(CTLR_ENABLED) {
+        speedController.setup();
+        debug("+ Speed Controller initialized.");
+    }
 
     // Completed
     debug("");
@@ -84,11 +114,17 @@ void setup() {
  */
 void loop() {
     // Retrieve Gyro readings
-    //gyro.retrieve();
+    if(GYRO_ENABLED) {
+        gyro.retrieve();
+    }
     
     // Retrieve Bluetooth readings
-    //bluetooth.retrieve();
+    if(BLUETOOTH_ENABLED) {
+        bluetooth.retrieve();
+    }
 
     // Handle Speed Controller
-    speedController.handle(gyro, bluetooth);
+    if(CTLR_ENABLED) {
+        speedController.handle();
+    }
 }

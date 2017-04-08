@@ -4,9 +4,6 @@
 //        Andreas, Jesper og Marcus - 3C        \\
 //----------------------------------------------\\
 
-// Prevent double inclusion
-#pragma once
-
 // Dependencies
 #include "SoftwareSerial.h";
 
@@ -25,14 +22,12 @@ class BluetoothReceiver {
         bool debugBluetooth;
 
         int tx, rx;
-        char command;
-
-        int aliveLength;
+        char serialCommand, command;
         long lastAlive;
 
         SoftwareSerial * bluetoothSerial;
 
-        BluetoothReceiver(int pinTX, int pinRX, bool debug, int alive = 2);
+        BluetoothReceiver(int pinTX, int pinRX, bool debug);
         void setup();
 
         void retrieve();
@@ -47,12 +42,11 @@ class BluetoothReceiver {
  *
  * @returns: void
  */
-BluetoothReceiver::BluetoothReceiver(int pinTX, int pinRX, bool debug, int alive = 2) {
+BluetoothReceiver::BluetoothReceiver(int pinTX, int pinRX, bool debug) {
     // Variables
     tx = pinTX;
     rx = pinRX;
     debugBluetooth = debug;
-    aliveLength = alive;
 
     // Open software serial
     bluetoothSerial = new SoftwareSerial(pinTX, pinRX);
@@ -70,7 +64,11 @@ void BluetoothReceiver::setup() {
     lastAlive = millis();
 
     // Begin serial
-    bluetoothSerial->begin(9600);
+    if(BLUETOOTH_SETUP) {
+        bluetoothSerial->begin(38400);
+    }else{
+        bluetoothSerial->begin(9600);
+    }
 }
 
 /*
@@ -95,6 +93,15 @@ void BluetoothReceiver::retrieve() {
         command = 'Z';
     }
 
+    // Serial to Bluetooth
+    if(debugBluetooth && Serial.available()) {
+        // Read Serial signal
+        serialCommand = Serial.read();
+
+        // Write to Bluetooth
+        bluetoothSerial->write(serialCommand);
+    }
+
     // Output debug command
     if(debugBluetooth && command != 'Z' && command != 'X') {
         Serial.print("Bluetooth Signal: ");
@@ -111,5 +118,5 @@ void BluetoothReceiver::retrieve() {
  */
 bool BluetoothReceiver::isAlive() {
     // Check time
-    return ((millis() - lastAlive) >= aliveLength);
+    return ((millis() - lastAlive) >= BLUETOOTH_ALIVE);
 }

@@ -4,9 +4,6 @@
 //        Andreas, Jesper og Marcus - 3C        \\
 //----------------------------------------------\\
 
-// Prevent double inclusion
-#pragma once
-
 /*
  * Class: MotorController
  * ----------------------------
@@ -19,11 +16,15 @@ class MotorController {
     // Public
     public:
 
-        int speed;
-        int pin1;
+        int pos, pin;
+        float speed = 1, baseSpeed = 1, nextSpeed = 1;
 
-        MotorController(int pinOne);
+        MotorController(int position, int pinNum);
         void setup();
+
+        void balanceSpeed(float value, bool inverse = false);
+        float handleSpeed();
+        float speedChange();
         void handle();
 
 };
@@ -35,9 +36,10 @@ class MotorController {
  *
  * @returns: void
  */
-MotorController::MotorController(int pinOne) {
+MotorController::MotorController(int position, int pinNum) {
     // Variables
-    pin1 = pinOne;
+    pos = position;
+    pin = pinNum;
 }
 
 /*
@@ -48,17 +50,83 @@ MotorController::MotorController(int pinOne) {
  * @returns: void
  */
 void MotorController::setup() {
-    // Pins
-    pinMode(pin1, OUTPUT);
+    // Setup pin mode
+    pinMode(pin, OUTPUT);
+
+    // Setup launch speed
+    nextSpeed = CTLR_SPEED_RANGE;
+}
+
+/*
+ * Function: speedChange
+ * ----------------------------
+ * Handle the motor speed change.
+ *
+ * @returns: float
+ */
+float MotorController::speedChange() {
+    // Return
+    return 0.005 * speed;
+}
+
+/*
+ * Function: balanceSpeed
+ * ----------------------------
+ * Handle the motor speed change on balance.
+ *
+ * @returns: void
+ */
+void MotorController::balanceSpeed(float value, bool inverse = false) {
+    // Always make float positive
+    value = abs(value);
+
+    // Inverse value if needed
+    if(inverse) {
+        value = -value;
+    }
+
+    // Set next speed
+    nextSpeed = constrain(speed + (CTLR_BALANCE_MULTIPLIER * value), 0, CTLR_SPEED_RANGE);
+}
+
+/*
+ * Function: handleSpeed
+ * ----------------------------
+ * Handle the motor speed.
+ *
+ * @returns: float
+ */
+float MotorController::handleSpeed() {
+    // Variables
+    float tempSpeed;
+
+    // Change speed
+    if(speed > nextSpeed) {
+        tempSpeed = speed - speedChange();
+    } else if(speed < nextSpeed) {
+        tempSpeed = speed + speedChange();
+    } else {
+        return speed;
+    }
+
+    // Ensure speed limits
+    tempSpeed = constrain(tempSpeed, 0, CTLR_SPEED_RANGE);
+
+    // Return
+    return tempSpeed;
 }
 
 /*
  * Function: handle
  * ----------------------------
- * Handle motor controller class.
+ * Handle the motor speed and rotation.
  *
  * @returns: void
  */
 void MotorController::handle() {
-    //
+    // Manage speed
+    speed = handleSpeed();
+
+    // Write speed
+    analogWrite(pin, speed);
 }

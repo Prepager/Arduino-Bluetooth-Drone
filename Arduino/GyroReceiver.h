@@ -4,9 +4,6 @@
 //        Andreas, Jesper og Marcus - 3C        \\
 //----------------------------------------------\\
 
-// Prevent double inclusion
-#pragma once
-
 // Dependencies
 #include "Wire.h";
 
@@ -28,10 +25,12 @@ class GyroReceiver {
         float gForceX, gForceY, gForceZ;
 
         long gyroX, gyroY, gyroZ;
+        long gyroXC, gyroYC, gyroZC;
         float rotX, rotY, rotZ;
 
         GyroReceiver(bool gyro = false, bool accel = false);
         void setup();
+        void calibrate();
 
         void retrieve();
         void outputValues();
@@ -39,7 +38,7 @@ class GyroReceiver {
         void retrieveRawAccel();
         void processRawAccel();
 
-        void retrieveRawGyro();
+        void retrieveRawGyro(bool calibrate = false);
         void processRawGyro();
     
 };
@@ -70,7 +69,6 @@ void GyroReceiver::setup() {
 
     // Begin transmission to MPU address
     Wire.beginTransmission(0b1101000);
-
         // Access '6.B - Power Management' register
         Wire.write(0x6B);
 
@@ -176,7 +174,7 @@ void GyroReceiver::processRawAccel() {
  *
  * @returns: void
  */
-void GyroReceiver::retrieveRawGyro() {
+void GyroReceiver::retrieveRawGyro(bool calibrate = false) {
     // Begin transmission to MPU address
     Wire.beginTransmission(0b1101000);
 
@@ -198,7 +196,16 @@ void GyroReceiver::retrieveRawGyro() {
     gyroZ = Wire.read()<<8|Wire.read();
 
     // Process results
-    processRawGyro();
+    if(!calibrate)
+    {
+        // Calibrate
+        gyroX -= gyroXC;
+        gyroY -= gyroYC;
+        gyroZ -= gyroZC;
+
+        // Process
+        processRawGyro();
+    }
 }
 
 /*
@@ -213,6 +220,34 @@ void GyroReceiver::processRawGyro() {
     rotX = gyroX / 131.0;
     rotY = gyroY / 131.0; 
     rotZ = gyroZ / 131.0;
+}
+
+/*
+ * Function: calibrate
+ * ----------------------------
+ * Calibrate gyro values.
+ *
+ * @returns: void
+ */
+void GyroReceiver::calibrate() {
+    // Record 2000 readings
+    for(int i = 0; i < 2000; i++) {
+        // Retrieve raw gyro readings
+        retrieveRawGyro(true);
+
+        // Add radings to average
+        gyroXC += gyroX;
+        gyroYC += gyroY;
+        gyroZC += gyroZ;
+
+        // Delay next reading
+        delay(2);
+    }
+
+    // Save readings to calibrate var
+    gyroXC /= 2000;
+    gyroYC /= 2000;
+    gyroZC /= 2000;
 }
 
 /*
