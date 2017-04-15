@@ -4,6 +4,9 @@
 //        Andreas, Jesper og Marcus - 3C        \\
 //----------------------------------------------\\
 
+// Dependencies
+#include "Servo.h";
+
 /*
  * Class: MotorController
  * ----------------------------
@@ -18,6 +21,8 @@ class MotorController {
 
         int pos, pin;
         float speed = 1, baseSpeed = 1, nextSpeed = 1;
+
+        Servo * motor;
 
         MotorController(int position, int pinNum);
         void setup();
@@ -51,10 +56,13 @@ MotorController::MotorController(int position, int pinNum) {
  */
 void MotorController::setup() {
     // Setup pin mode
-    pinMode(pin, OUTPUT);
+    //pinMode(pin, OUTPUT);
+    motor = new Servo();
+    motor->attach(pin);
+    motor->write(20);
 
     // Setup launch speed
-    nextSpeed = CTLR_SPEED_RANGE;
+    nextSpeed = CTLR_SPEED_HIGH_RANGE;
 }
 
 /*
@@ -66,7 +74,7 @@ void MotorController::setup() {
  */
 float MotorController::speedChange() {
     // Return
-    return 0.005 * speed;
+    return 0.0003 * speed;
 }
 
 /*
@@ -86,7 +94,7 @@ void MotorController::balanceSpeed(float value, bool inverse = false) {
     }
 
     // Set next speed
-    nextSpeed = constrain(speed + (CTLR_BALANCE_MULTIPLIER * value), 0, CTLR_SPEED_RANGE);
+    nextSpeed = constrain(speed + (CTLR_BALANCE_MULTIPLIER * value), CTLR_SPEED_LOW_RANGE, CTLR_SPEED_HIGH_RANGE);
 }
 
 /*
@@ -110,7 +118,7 @@ float MotorController::handleSpeed() {
     }
 
     // Ensure speed limits
-    tempSpeed = constrain(tempSpeed, 0, CTLR_SPEED_RANGE);
+    tempSpeed = constrain(tempSpeed, CTLR_SPEED_LOW_RANGE, CTLR_SPEED_HIGH_RANGE);
 
     // Return
     return tempSpeed;
@@ -128,5 +136,10 @@ void MotorController::handle() {
     speed = handleSpeed();
 
     // Write speed
-    analogWrite(pin, speed);
+    motor->write(speed);
+
+    Serial.print(pos);
+    Serial.print(" - ");
+    Serial.println(speed);
+    //analogWrite(pin, speed);
 }

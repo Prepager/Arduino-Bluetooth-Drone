@@ -22,19 +22,20 @@
 // Settings - Controller
 #define DEBUG_CONTROLLER true
 #define CTLR_ENABLED true
-#define CTLR_SPEED_RANGE 255
+#define CTLR_SPEED_LOW_RANGE 60
+#define CTLR_SPEED_HIGH_RANGE 70
 #define CTLR_LAUNCH_FORCE 10
-#define CTLR_INVERSE_SPEED 200
+#define CTLR_INVERSE_SPEED 68
 #define CTLR_BALANCE_FORCE 0.10
 #define CTLR_BALANCE_TIMER 8000
-#define CTLR_BALANCE_MULTIPLIER 80
+#define CTLR_BALANCE_MULTIPLIER 2
 
 // Motor Controllers
 #include "MotorController.h";
-extern MotorController motorFrontLeft(1, 9);
+extern MotorController motorFrontLeft(1, 3);
 extern MotorController motorFrontRight(2, 11);
-extern MotorController motorBackLeft(3, 10);
-extern MotorController motorBackRight(4, 3);
+extern MotorController motorBackLeft(3, 5);
+extern MotorController motorBackRight(4, 6);
 
 // Helper Dependencies
 #include "Helpers.h";
@@ -103,6 +104,8 @@ void setup() {
     debug("");
     debug("-- Setup Completed --");
     debug("");
+
+    delay(4000);
 }
 
 /*
