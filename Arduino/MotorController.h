@@ -20,14 +20,13 @@ class MotorController {
     public:
 
         int pos, pin;
-        float speed = 1, baseSpeed = 1, nextSpeed = 1;
+        float speed = CTLR_SPEED_START, baseSpeed = CTLR_SPEED_START, nextSpeed = CTLR_SPEED_START;
 
         Servo * motor;
 
         MotorController(int position, int pinNum);
         void setup();
 
-        void balanceSpeed(float value, bool inverse = false);
         float handleSpeed();
         float speedChange();
         void handle();
@@ -55,14 +54,13 @@ MotorController::MotorController(int position, int pinNum) {
  * @returns: void
  */
 void MotorController::setup() {
+    //
+
     // Setup pin mode
     //pinMode(pin, OUTPUT);
-    motor = new Servo();
+    /*motor = new Servo();
     motor->attach(pin);
-    motor->write(20);
-
-    // Setup launch speed
-    nextSpeed = CTLR_SPEED_HIGH_RANGE;
+    motor->write(20);*/
 }
 
 /*
@@ -75,26 +73,6 @@ void MotorController::setup() {
 float MotorController::speedChange() {
     // Return
     return 0.0003 * speed;
-}
-
-/*
- * Function: balanceSpeed
- * ----------------------------
- * Handle the motor speed change on balance.
- *
- * @returns: void
- */
-void MotorController::balanceSpeed(float value, bool inverse = false) {
-    // Always make float positive
-    value = abs(value);
-
-    // Inverse value if needed
-    if(inverse) {
-        value = -value;
-    }
-
-    // Set next speed
-    nextSpeed = constrain(speed + (CTLR_BALANCE_MULTIPLIER * value), CTLR_SPEED_LOW_RANGE, CTLR_SPEED_HIGH_RANGE);
 }
 
 /*
@@ -136,10 +114,10 @@ void MotorController::handle() {
     speed = handleSpeed();
 
     // Write speed
-    motor->write(speed);
+    //motor->write(speed);
 
-    Serial.print(pos);
+    /*Serial.print(pos);
     Serial.print(" - ");
-    Serial.println(speed);
+    Serial.println(speed);*/
     //analogWrite(pin, speed);
 }

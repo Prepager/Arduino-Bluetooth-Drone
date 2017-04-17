@@ -22,13 +22,21 @@
 // Settings - Controller
 #define DEBUG_CONTROLLER true
 #define CTLR_ENABLED true
-#define CTLR_SPEED_LOW_RANGE 60
-#define CTLR_SPEED_HIGH_RANGE 70
+#define CTLR_SPEED_START 63
+#define CTLR_SPEED_LOW_RANGE 0 //60
+#define CTLR_SPEED_HIGH_RANGE 255 //70
+
+// Settings - Controller Balance
 #define CTLR_LAUNCH_FORCE 10
-#define CTLR_INVERSE_SPEED 68
 #define CTLR_BALANCE_FORCE 0.10
 #define CTLR_BALANCE_TIMER 8000
-#define CTLR_BALANCE_MULTIPLIER 2
+#define CTLR_BALANCE_MULTIPLIER 50
+
+// Settings - Controller PID
+#define CTLR_PID_SPEED 10
+#define CTLR_PID_P 1
+#define CTLR_PID_I 0
+#define CTLR_PID_D 1
 
 // Motor Controllers
 #include "MotorController.h";

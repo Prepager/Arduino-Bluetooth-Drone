@@ -30,16 +30,25 @@ class SpeedController {
     // Public
     public:
 
-        bool debugSpeed, launched, balancing;
-        long balancingDone;
+        bool debugSpeed, launched;
+        long balancingDone = millis() + CTLR_BALANCE_TIMER;
+
         bool changed[4];
+
+        long nextPid = millis();
+
+        float pastX = 0, pastY = 0, pastZ = 0; // Integral
+        float futureX, futureY, futureZ; // Derivative
+        float errorX, errorY, errorZ; // Proportional
+
+        float setpointX = 0, setpointY = 0, setpointZ = 0;
+        float pastErrorX = 0, pastErrorY = 0, pastErrorZ = 0;
 
         SpeedController(bool debug = false);
         void setup();
         
         void handle();
         void handleBalance();
-        void balanceStep(bool step, bool equal, float reading, int motor, int inv, int invEqual);
         //static void callback();
 
 };
@@ -86,93 +95,37 @@ void SpeedController::setup() {
  * @returns: void
  */
 void SpeedController::handle() {
-    // Check launched status
-    if(!launched) {
-        // Gyro above launch force limit
-        if(gyro.rotY > CTLR_LAUNCH_FORCE && !balancing) {
-            // Save status
-            balancing = true;
-            balancingDone = millis() + CTLR_BALANCE_TIMER;
-
-            // Save motor speed
-            for(int i = 0; i < 4; i++) {
-                // Set new balanced speed
-                int curSpeed = motorList[i].speed;
-                motorList[i].baseSpeed = curSpeed;
-                motorList[i].nextSpeed = curSpeed;
-
-                // Output debug message
-                if(debugSpeed) {
-                    Serial.print("+ Motor (");
-                    Serial.print(motorList[i].pos);
-                    Serial.print(") stopped at ");
-                    Serial.print(curSpeed);
-                    Serial.println(" for launch.");
-                }
-            }
-
-            // Output debug message
-            if(debugSpeed) {
-                Serial.print("");
-                Serial.println("+ Motors waiting for balancing.");
-            }
+    // Check launch balancing compleated
+    if(!launched && millis() >= balancingDone) {
+        // Save base values
+        for(int i = 0; i < 4; i++) {
+            int curSpeed = motorList[i].speed;
+            motorList[i].baseSpeed = curSpeed;
+            motorList[i].nextSpeed = curSpeed;
         }
 
-        // Gyro launched and balanced
-        if(balancing && millis() >= balancingDone) {
-            // Save base values
-            for(int i = 0; i < 4; i++) {
-                int curSpeed = motorList[i].speed;
-                motorList[i].baseSpeed = curSpeed;
-                motorList[i].nextSpeed = curSpeed;
-            }
+        // Finish launch state
+        launched = true;
 
-            // Finish launch state
-            launched = true;
-
-            // Output debug message
-            if(debugSpeed) {
-                Serial.print("");
-                Serial.println("+ Motors balanced. Ready for use.");
-            }
+        // Output debug message
+        if(debugSpeed) {
+            Serial.print("");
+            Serial.println("+ Motors balanced. Ready for use.");
         }
     }
 
-    // Balance motors
-    handleBalance();
+    // Check pid next run
+    if(millis() >= nextPid) {
+        // Balance motors
+        handleBalance();
+
+        // Set next time
+        nextPid = millis() + CTLR_PID_SPEED;
+    }
 
     // Handle motor speed
     for(int i = 0; i < 4; i++) {
         motorList[i].handle();
-    }
-}
-
-/*
- * Function: balanceStep
- * ----------------------------
- * Handle each step of the balance process.
- *
- * @returns: void
- */
-void SpeedController::balanceStep(bool step, bool equal, float reading, int motor, int inv, int invEqual) {
-    if(step) {
-        // DEBUG LEDS
-        digitalWrite(debugList[motor], HIGH);
-
-        // Check for inverse action
-        if(motorList[motor].baseSpeed <= CTLR_INVERSE_SPEED) {
-            // Increase current motor
-            motorList[motor].balanceSpeed(reading);
-            changed[motor] = true;
-        } else if(!equal) {
-            // Decrease opposite motor
-            motorList[inv].balanceSpeed(reading, true);
-            changed[inv] = true;
-        } else {
-            // Decrease opposit motor when equal (2 active)
-            motorList[invEqual].balanceSpeed(reading, true);
-            changed[invEqual] = true;
-        }
     }
 }
 
@@ -184,49 +137,37 @@ void SpeedController::balanceStep(bool step, bool equal, float reading, int moto
  * @returns: void
  */
 void SpeedController::handleBalance() {
-    // Read accel readings
+    // Read gyro radings
     float x = gyro.gForceX;
     float y = gyro.gForceY;
     float z = gyro.gForceZ;
-    float f = CTLR_BALANCE_FORCE;
-
-    // Handle Y axis
-    bool left = (y > f);
-    bool right = (y < -f);
-
-    // Handle Z axis
-    bool backwards = (z > f);
-    bool forward = (z < -f);
-
-    // DEBUG LEDS
-    for(int i = 0; i < 4; i++) {
-        digitalWrite(debugList[i], LOW);
-    }
-
-    // Reset changed
-    for(int i = 0; i < 4; i++) {
-        changed[i] = false;
-    }
-
-    // Y Axis
-    balanceStep((left && !backwards), (!forward && !backwards), y, 0, 2, 1);
-    balanceStep((left && !forward), (!forward && !backwards), y, 2, 0, 3);
-    balanceStep((right && !backwards), (!forward && !backwards), y, 1, 3, 0);
-    balanceStep((right && !forward), (!forward && !backwards), y, 3, 1, 2);
 
     // Z Axis
-    balanceStep((forward && !right), (!left && !right), z, 0, 1, 2);
-    balanceStep((forward && !left), (!left && !right), z, 1, 0, 3);
-    balanceStep((backwards && !right), (!left && !right), z, 2, 3, 0);
-    balanceStep((backwards && !left), (!left && !right), z, 3, 2, 1);
+    errorX = setpointX - x;
+    pastX += (errorX * CTLR_PID_SPEED);
+    futureX = (errorX - pastErrorX) / CTLR_PID_SPEED;
+    float xOutput = (CTLR_PID_P * errorX) + (CTLR_PID_I * pastX) + (CTLR_PID_D * futureX);
+    pastErrorX = errorX;
 
-    // Loop though and check unsaved
-    for(int i = 0; i < 4; i++) {
-        if(!changed[i] && motorList[i].baseSpeed != 1) {
-            // Set speed to base
-            motorList[i].nextSpeed = motorList[i].baseSpeed;
-        }
-    }
+    // Y Axis
+    errorY = setpointY - y;
+    pastY += (errorY * CTLR_PID_SPEED);
+    futureY = (errorY - pastErrorY) / CTLR_PID_SPEED;
+    float yOutput = (CTLR_PID_P * errorY) + (CTLR_PID_I * pastY) + (CTLR_PID_D * futureY);
+    pastErrorY = errorY;
+
+    // Z Axis
+    errorZ = setpointZ - z;
+    pastZ += (errorZ * CTLR_PID_SPEED);
+    futureZ = (errorZ - pastErrorZ) / CTLR_PID_SPEED;
+    float zOutput = (CTLR_PID_P * errorZ) + (CTLR_PID_I * pastZ) + (CTLR_PID_D * futureZ);
+    pastErrorZ = errorZ;
+
+    // Write speed to motor
+    motorList[0].nextSpeed = motorList[0].baseSpeed + (CTLR_BALANCE_MULTIPLIER * zOutput);
+    motorList[1].nextSpeed = motorList[1].baseSpeed + (CTLR_BALANCE_MULTIPLIER * yOutput);
+    motorList[2].nextSpeed = motorList[2].baseSpeed + (CTLR_BALANCE_MULTIPLIER * -zOutput);
+    motorList[3].nextSpeed = motorList[3].baseSpeed + (CTLR_BALANCE_MULTIPLIER * -yOutput);
 }
 
 /*
