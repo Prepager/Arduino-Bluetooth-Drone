@@ -7,11 +7,11 @@
 /*
  * Function: isDebug
  * ----------------------------
- * Return weather or not the variable is in debug.
+ * Return weather or not the variable is currently in debug.
  *
  * @returns: bool
  */
-bool isDebug(bool debugVariable) {
+extern bool isDebug(bool debugVariable) {
     return DEBUG && debugVariable;
 }
 
@@ -22,7 +22,7 @@ bool isDebug(bool debugVariable) {
  *
  * @returns: void
  */
-void debug(String text) {
+extern void debug(String text) {
     if(DEBUG) {
         Serial.println(text);
     }

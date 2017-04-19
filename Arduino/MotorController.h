@@ -21,17 +21,14 @@ class MotorController {
 
         int pos, pin;
         
-        float speed = CTLR_SPEED_START,
-        baseSpeed = CTLR_SPEED_START,
-        nextSpeed = CTLR_SPEED_START;
+        float speed = SPEED_HOVER,
+        baseSpeed = SPEED_HOVER,
+        nextSpeed = SPEED_HOVER;
 
         Servo * motor;
 
         MotorController(int position, int pinNum);
         void setup();
-
-        //float handleSpeed();
-        //float speedChange();
         void handle();
 
 };
@@ -60,48 +57,8 @@ void MotorController::setup() {
     // Setup pin mode
     motor = new Servo();
     motor->attach(pin);
-    motor->writeMicroseconds(CTLR_SPEED_BASE);
+    motor->writeMicroseconds(SPEED_MINIMAL);
 }
-
-/*
- * Function: speedChange
- * ----------------------------
- * Handle the motor speed change.
- *
- * @returns: float
- */
-/*float MotorController::speedChange() {
-    // Return
-    return 0.0003 * speed;
-}*/
-
-/*
- * Function: handleSpeed
- * ----------------------------
- * Handle the motor speed.
- *
- * @returns: float
- */
-/*float MotorController::handleSpeed() {
-    // Variables
-    float tempSpeed;
-
-    // Change speed
-    tempSpeed = 0;
-    /*if(speed > nextSpeed) {
-        tempSpeed = speed - speedChange();
-    } else if(speed < nextSpeed) {
-        tempSpeed = speed + speedChange();
-    } else {
-        return speed;
-    }*/
-
-    // Ensure speed limits
-    /*tempSpeed = constrain(tempSpeed, CTLR_SPEED_LOW_RANGE, CTLR_SPEED_HIGH_RANGE);
-
-    // Return
-    return tempSpeed;
-}*/
 
 /*
  * Function: handle
@@ -112,22 +69,8 @@ void MotorController::setup() {
  */
 void MotorController::handle() {
     // Manage speed
-    speed = constrain(nextSpeed, CTLR_SPEED_LOW_RANGE, CTLR_SPEED_HIGH_RANGE);
+    speed = constrain(nextSpeed, SPEED_RANGE_MIN, SPEED_RANGE_MAX);
 
     // Write speed
-    //if(pos == 1 || pos == 3) {
-        motor->writeMicroseconds(speed);
-    /*} else {
-        motor->writeMicroseconds(CTLR_SPEED_BASE);
-    }*/
-
-    // Debug output
-    /*Serial.print(pos);
-    Serial.print(" - ");
-    Serial.print(speed);
-    Serial.print("   ");
-
-    if(pos == 3) {
-        Serial.println("");
-    }*/
+    motor->writeMicroseconds(speed);
 }

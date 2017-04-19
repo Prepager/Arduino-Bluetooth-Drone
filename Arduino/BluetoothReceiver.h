@@ -22,12 +22,12 @@ class BluetoothReceiver {
         bool debugBluetooth;
 
         int tx, rx;
-        char serialCommand, command;
+        char command;
         long lastAlive;
 
         SoftwareSerial * bluetoothSerial;
 
-        BluetoothReceiver(int pinTX, int pinRX, bool debug);
+        BluetoothReceiver(int pinTX, int pinRX);
         void setup();
 
         void retrieve();
@@ -42,11 +42,13 @@ class BluetoothReceiver {
  *
  * @returns: void
  */
-BluetoothReceiver::BluetoothReceiver(int pinTX, int pinRX, bool debug) {
-    // Variables
+BluetoothReceiver::BluetoothReceiver(int pinTX, int pinRX) {
+    // Save TX and RX transfer ports
     tx = pinTX;
     rx = pinRX;
-    debugBluetooth = debug;
+
+    // Set debugging mode
+    debugBluetooth = isDebug(DEBUG_BLUETOOTH);
 
     // Open software serial
     bluetoothSerial = new SoftwareSerial(pinTX, pinRX);
@@ -60,10 +62,10 @@ BluetoothReceiver::BluetoothReceiver(int pinTX, int pinRX, bool debug) {
  * @returns: void
  */
 void BluetoothReceiver::setup() {
-    // Reset alive
+    // Reset alive timer
     lastAlive = millis();
 
-    // Begin serial
+    // Begin serial connection
     if(BLUETOOTH_SETUP) {
         bluetoothSerial->begin(38400);
     }else{
@@ -79,28 +81,20 @@ void BluetoothReceiver::setup() {
  * @returns: void
  */
 void BluetoothReceiver::retrieve() {
-    // Bluetooth available
+    // Check if Bluetooth signal is available
     if(bluetoothSerial->available()) {
         // Read Bluetooth signal
         command = bluetoothSerial->read();
 
-        // Alive command
+        // Check for alive signal
         if(command == 'X') {
+            // Reset alive timer
             lastAlive = millis();
         }
     }else{
-        // Sleep signal
+        // Return sleep signal
         command = 'Z';
     }
-
-    // Serial to Bluetooth
-    /*if(debugBluetooth && Serial.available()) {
-        // Read Serial signal
-        serialCommand = Serial.read();
-
-        // Write to Bluetooth
-        bluetoothSerial->write(serialCommand);
-    }*/
 
     // Output debug command
     if(debugBluetooth && command != 'Z' && command != 'X') {
@@ -117,6 +111,6 @@ void BluetoothReceiver::retrieve() {
  * @returns: bool
  */
 bool BluetoothReceiver::isAlive() {
-    // Check time
-    return ((millis() - lastAlive) >= BLUETOOTH_ALIVE);
+    // Return true if alive timer is below limit
+    return ((millis() - lastAlive) >= BLUETOOTH_DEADMAN);
 }

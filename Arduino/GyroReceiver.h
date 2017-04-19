@@ -30,7 +30,8 @@ class GyroReceiver {
 
         float roll, pitch;
 
-        GyroReceiver(bool gyro = false, bool accel = false, bool axes = false);
+        GyroReceiver(int test);
+
         void setup();
         void calibrate();
 
@@ -54,11 +55,11 @@ class GyroReceiver {
  *
  * @returns: void
  */
-GyroReceiver::GyroReceiver(bool gyro = false, bool accel = false, bool axes = false) {
-    // Debug
-    debugGyro = gyro;
-    debugAccel = accel;
-    debugAxes = axes;
+GyroReceiver::GyroReceiver(int test) {
+    // Debugging
+    debugGyro = isDebug(DEBUG_GYRO);
+    debugAccel = isDebug(DEBUG_ACCEL);
+    debugAxes = isDebug(DEBUG_AXES);
 }
 
 /*
@@ -267,7 +268,7 @@ void GyroReceiver::processAxes() {
  */
 void GyroReceiver::calibrate() {
     // Record 2000 readings
-    for(int i = 0; i < 2000; i++) {
+    for(int i = 0; i < GYRO_READINGS; i++) {
         // Retrieve raw gyro readings
         retrieveRawGyro(true);
 
@@ -277,13 +278,13 @@ void GyroReceiver::calibrate() {
         gyroZC += gyroZ;
 
         // Delay next reading
-        delay(2);
+        delay(3);
     }
 
     // Save readings to calibrate var
-    gyroXC /= 2000;
-    gyroYC /= 2000;
-    gyroZC /= 2000;
+    gyroXC /= GYRO_READINGS;
+    gyroYC /= GYRO_READINGS;
+    gyroZC /= GYRO_READINGS;
 }
 
 /*
