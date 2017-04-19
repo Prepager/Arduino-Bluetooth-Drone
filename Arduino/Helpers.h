@@ -27,3 +27,29 @@ void debug(String text) {
         Serial.println(text);
     }
 }
+
+/*
+ * Function: delayCountdown
+ * ----------------------------
+ * Countdown delay.
+ *
+ * @returns: void
+ */
+void delayCountdown(int time) {
+	if(DEBUG) {
+		// Loop
+		int reps = time/1000;
+		for(int i = 0; i < reps; i++) {
+			// Print
+			Serial.print("+ Starting in ");
+			Serial.print(reps-i);
+			Serial.println(" seconds.");
+
+			// Delay
+			delay(1000);
+		}
+	} else {
+		// Normal delay
+		delay(time);
+	}
+}

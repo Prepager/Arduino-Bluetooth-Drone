@@ -20,15 +20,18 @@ class MotorController {
     public:
 
         int pos, pin;
-        float speed = CTLR_SPEED_START, baseSpeed = CTLR_SPEED_START, nextSpeed = CTLR_SPEED_START;
+        
+        float speed = CTLR_SPEED_START,
+        baseSpeed = CTLR_SPEED_START,
+        nextSpeed = CTLR_SPEED_START;
 
         Servo * motor;
 
         MotorController(int position, int pinNum);
         void setup();
 
-        float handleSpeed();
-        float speedChange();
+        //float handleSpeed();
+        //float speedChange();
         void handle();
 
 };
@@ -54,13 +57,10 @@ MotorController::MotorController(int position, int pinNum) {
  * @returns: void
  */
 void MotorController::setup() {
-    //
-
     // Setup pin mode
-    //pinMode(pin, OUTPUT);
-    /*motor = new Servo();
+    motor = new Servo();
     motor->attach(pin);
-    motor->write(20);*/
+    motor->writeMicroseconds(CTLR_SPEED_BASE);
 }
 
 /*
@@ -70,10 +70,10 @@ void MotorController::setup() {
  *
  * @returns: float
  */
-float MotorController::speedChange() {
+/*float MotorController::speedChange() {
     // Return
     return 0.0003 * speed;
-}
+}*/
 
 /*
  * Function: handleSpeed
@@ -82,25 +82,26 @@ float MotorController::speedChange() {
  *
  * @returns: float
  */
-float MotorController::handleSpeed() {
+/*float MotorController::handleSpeed() {
     // Variables
     float tempSpeed;
 
     // Change speed
-    if(speed > nextSpeed) {
+    tempSpeed = 0;
+    /*if(speed > nextSpeed) {
         tempSpeed = speed - speedChange();
     } else if(speed < nextSpeed) {
         tempSpeed = speed + speedChange();
     } else {
         return speed;
-    }
+    }*/
 
     // Ensure speed limits
-    tempSpeed = constrain(tempSpeed, CTLR_SPEED_LOW_RANGE, CTLR_SPEED_HIGH_RANGE);
+    /*tempSpeed = constrain(tempSpeed, CTLR_SPEED_LOW_RANGE, CTLR_SPEED_HIGH_RANGE);
 
     // Return
     return tempSpeed;
-}
+}*/
 
 /*
  * Function: handle
@@ -111,13 +112,22 @@ float MotorController::handleSpeed() {
  */
 void MotorController::handle() {
     // Manage speed
-    speed = handleSpeed();
+    speed = constrain(nextSpeed, CTLR_SPEED_LOW_RANGE, CTLR_SPEED_HIGH_RANGE);
 
     // Write speed
-    //motor->write(speed);
+    //if(pos == 1 || pos == 3) {
+        motor->writeMicroseconds(speed);
+    /*} else {
+        motor->writeMicroseconds(CTLR_SPEED_BASE);
+    }*/
 
+    // Debug output
     /*Serial.print(pos);
     Serial.print(" - ");
-    Serial.println(speed);*/
-    //analogWrite(pin, speed);
+    Serial.print(speed);
+    Serial.print("   ");
+
+    if(pos == 3) {
+        Serial.println("");
+    }*/
 }

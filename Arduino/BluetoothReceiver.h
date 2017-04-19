@@ -94,13 +94,13 @@ void BluetoothReceiver::retrieve() {
     }
 
     // Serial to Bluetooth
-    if(debugBluetooth && Serial.available()) {
+    /*if(debugBluetooth && Serial.available()) {
         // Read Serial signal
         serialCommand = Serial.read();
 
         // Write to Bluetooth
         bluetoothSerial->write(serialCommand);
-    }
+    }*/
 
     // Output debug command
     if(debugBluetooth && command != 'Z' && command != 'X') {

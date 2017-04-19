@@ -19,7 +19,7 @@ class GyroReceiver {
     // Public
     public:
 
-        bool debugGyro, debugAccel;
+        bool debugAxes, debugGyro, debugAccel;
 
         long accelX, accelY, accelZ;
         float gForceX, gForceY, gForceZ;
@@ -28,7 +28,9 @@ class GyroReceiver {
         long gyroXC, gyroYC, gyroZC;
         float rotX, rotY, rotZ;
 
-        GyroReceiver(bool gyro = false, bool accel = false);
+        float roll, pitch;
+
+        GyroReceiver(bool gyro = false, bool accel = false, bool axes = false);
         void setup();
         void calibrate();
 
@@ -40,6 +42,8 @@ class GyroReceiver {
 
         void retrieveRawGyro(bool calibrate = false);
         void processRawGyro();
+
+        void processAxes();
     
 };
 
@@ -50,10 +54,11 @@ class GyroReceiver {
  *
  * @returns: void
  */
-GyroReceiver::GyroReceiver(bool gyro = false, bool accel = false) {
+GyroReceiver::GyroReceiver(bool gyro = false, bool accel = false, bool axes = false) {
     // Debug
     debugGyro = gyro;
     debugAccel = accel;
+    debugAxes = axes;
 }
 
 /*
@@ -115,8 +120,11 @@ void GyroReceiver::retrieve() {
     retrieveRawAccel();
     retrieveRawGyro();
 
+    // Process axes
+    processAxes();
+
     // Debug
-    if(debugGyro || debugAccel) {
+    if(debugGyro || debugAccel || debugAxes) {
         outputValues();
     }
 }
@@ -223,6 +231,34 @@ void GyroReceiver::processRawGyro() {
 }
 
 /*
+ * Function: processAxes
+ * ----------------------------
+ * Process gyro and accel data to retrieve roll and pitch.
+ *
+ * @returns: void
+ */
+void GyroReceiver::processAxes() {
+    // Convert degrees/s to degrees
+    pitch += rotX * executionTime;
+    roll -= rotY * executionTime;
+
+    // Calculate total accel force
+    int totalForce = abs(accelX) + abs(accelY) + abs(accelZ);
+
+    // Compensate for gyro error
+    // 16Bit: 8192 = 0.5G; 32768 = 2.0G
+    if(totalForce > 8192 && totalForce < 32768) {
+        // Pitch
+        float pitchAccel = atan2f(accelY, accelZ) * (180 / PI);
+        pitch = (pitch * 0.98) + (pitchAccel * 0.02);
+
+        // Roll
+        float pitchRoll = atan2f(accelX, accelZ) * (180 / PI);
+        roll = (roll * 0.98) + (pitchRoll * 0.02);
+    }
+}
+
+/*
  * Function: calibrate
  * ----------------------------
  * Calibrate gyro values.
@@ -307,5 +343,17 @@ void GyroReceiver::outputValues() {
             Serial.print(" Z=");
             if(gForceZ >= 0) { Serial.print(" "); }
             Serial.println(gForceZ);
+    }
+
+    // Output axes values
+    if(debugAxes)
+    {
+        // Roll
+        Serial.print("Roll (Deg) ");
+        Serial.print(roll);
+
+        // Pitch
+        Serial.print(" Pitch (Deg) ");
+        Serial.println(pitch);
     }
 }
