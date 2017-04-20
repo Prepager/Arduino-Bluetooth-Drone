@@ -14,9 +14,11 @@ import android.view.MenuItem;
 import android.widget.Toast;
 import android.widget.Button;
 import android.widget.SeekBar;
-import android.bluetooth.BluetoothSocket;
 import android.content.Intent;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
+import android.bluetooth.BluetoothSocket;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.os.AsyncTask;
@@ -47,6 +49,8 @@ public class Controller extends AppCompatActivity {
     private Button btnDown;
     private Button btnRotateLeft;
     private Button btnRotateRight;
+
+    final Context context = this;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -243,6 +247,29 @@ public class Controller extends AppCompatActivity {
             }
 
             finish();
+        }
+
+        // Kill
+        if(selectID == R.id.action_kill) {
+            // Open dialog
+            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
+            alertDialogBuilder
+                .setCancelable(false)
+                .setTitle("Kill Switch")
+                .setMessage("Are you sure you want the drone to drop dead?")
+                .setPositiveButton("Yes, kill it", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        sendBluetoothSignal("Q");
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.cancel();
+                    }
+                }).show();
+
+            AlertDialog alertDialog = alertDialogBuilder.create();
+            alertDialog.show();
         }
 
         // Return default

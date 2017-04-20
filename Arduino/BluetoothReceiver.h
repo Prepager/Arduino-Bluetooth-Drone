@@ -85,12 +85,9 @@ void BluetoothReceiver::retrieve() {
     if(bluetoothSerial->available()) {
         // Read Bluetooth signal
         command = bluetoothSerial->read();
-
-        // Check for alive signal
-        if(command == 'X') {
-            // Reset alive timer
-            lastAlive = millis();
-        }
+        
+        // Reset alive timer
+        lastAlive = millis();
     }else{
         // Return sleep signal
         command = 'Z';

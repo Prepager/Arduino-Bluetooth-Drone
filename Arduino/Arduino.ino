@@ -62,7 +62,6 @@ void setup() {
     // Setup Gyro module
     if(MODULE_GYROSCOPE) {
         // Setup Gyro
-        delay(1000);
         gyro.setup();
         debug("+ Gyro initialized.");
 
