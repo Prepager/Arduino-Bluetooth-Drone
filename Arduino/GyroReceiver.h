@@ -35,7 +35,7 @@ class GyroReceiver {
         void setup();
         void calibrate();
 
-        void retrieve();
+        void retrieve(bool output = true);
         void outputValues();
 
         void retrieveRawAccel();
@@ -107,6 +107,18 @@ void GyroReceiver::setup() {
 
         // End transmission
         Wire.endTransmission();
+
+    // Calibrate axes readings
+    for(int i = 0; i < GYRO_UP_READINGS; i++) {
+        // Set new execution time used for degrees convertion
+        executionTime = 0.031;
+
+        // Retrieve gyro values
+        retrieve(false);
+
+        // Delay for better values
+        delay(3);
+    }
 }
 
 /*
@@ -116,7 +128,7 @@ void GyroReceiver::setup() {
  *
  * @returns: void
  */
-void GyroReceiver::retrieve() {
+void GyroReceiver::retrieve(bool output = true) {
     // Retrieve values
     retrieveRawAccel();
     retrieveRawGyro();
@@ -125,7 +137,7 @@ void GyroReceiver::retrieve() {
     processAxes();
 
     // Debug
-    if(debugGyro || debugAccel || debugAxes) {
+    if(output && (debugGyro || debugAccel || debugAxes)) {
         outputValues();
     }
 }
@@ -251,11 +263,11 @@ void GyroReceiver::processAxes() {
     if(totalForce > 8192 && totalForce < 32768) {
         // Pitch
         float pitchAccel = atan2f(accelY, accelZ) * (180 / PI);
-        pitch = (pitch * 0.98) + (pitchAccel * 0.02);
+        pitch = (pitch * 0.90) + (pitchAccel * 0.10);
 
         // Roll
         float pitchRoll = atan2f(accelX, accelZ) * (180 / PI);
-        roll = (roll * 0.98) + (pitchRoll * 0.02);
+        roll = (roll * 0.90) + (pitchRoll * 0.10);
     }
 }
 

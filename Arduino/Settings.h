@@ -37,7 +37,7 @@
 
 // Gyroscope
 #define DEBUG_GYRO 	false 		// Output X, Y and Z gyroscope readings in Deg.
-#define DEBUG_ACCEL false 		// Output X, Y and Z accelerometer readings in G.
+#define DEBUG_ACCEL true 		// Output X, Y and Z accelerometer readings in G.
 #define DEBUG_AXES 	false		// Output Roll and Pitch in Deg.
 
 // Controller
@@ -67,20 +67,23 @@
  * Calibration & fine tuning of the various modules.
  */
 
+// ((0.66+0.73+0.68+0.73+0.67+0.63+0.73+0.64+0.69+0.70+0.61)/11)*2
+
 // PID Controller
-#define CONTROLLER_PID_P 0.2	// The PID Proportional value (Now)
-#define CONTROLLER_PID_I 0		// The PID Integral value (Past)
-#define CONTROLLER_PID_D 0.15	// the PID Derivative value (Future)
+#define CONTROLLER_PID_P 0.8*0.5//0.8*0.7//0.2	// The PID Proportional value (Now)
+#define CONTROLLER_PID_I 0//0.90/2 //0//0 //1.358/2		// The PID Integral value (Past)
+#define CONTROLLER_PID_D 0.90/7.5 //0//1.358/8//0.15	// the PID Derivative value (Future)
 
 // Gyroscope
-#define GYRO_CALIBRATE 	false	// Toggle the calibration of the gyroscope on launch.
-#define GYRO_READINGS 	2000	// The amount of gyroscope readings used for calibration (3ms in between).
+#define GYRO_CALIBRATE true	// Toggle the calibration of the gyroscope on launch.
+#define GYRO_READINGS 1000		// The amount of gyroscope readings used for calibration (3ms in between).
+#define GYRO_UP_READINGS 250	// The amount of gyroscope readings used for axes calibration (3ms in between).
 
 // Controller
 #define ANGLE_MOVEMENT	4		// The angle the motors should accept on movement.
 #define SPEED_MOVEMENT	5		// The ms the motors should increase on up down movement.
 #define SPEED_MINIMAL 	750		// The minimal speed for the motors to enable but not spin.
-#define SPEED_HOVER		1320	// The base and start value for hovering.
+#define SPEED_HOVER		1200	// The base and start value for hovering.
 #define SPEED_RANGE_MIN 750		// The minimum speed for the motors.
 #define SPEED_RANGE_MAX 1500	// The maximum speed for the motors.
 

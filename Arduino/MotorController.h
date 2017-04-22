@@ -58,6 +58,9 @@ void MotorController::setup() {
     motor = new Servo();
     motor->attach(pin);
     motor->writeMicroseconds(SPEED_MINIMAL);
+
+    pinMode(8, INPUT);
+    pinMode(12, OUTPUT);
 }
 
 /*
@@ -69,8 +72,25 @@ void MotorController::setup() {
  */
 void MotorController::handle() {
     // Manage speed
-    speed = constrain(nextSpeed, SPEED_RANGE_MIN, SPEED_RANGE_MAX);
+    digitalWrite(12, HIGH);
+    speed = constrain(nextSpeed+map(analogRead(0), 0, 1023, 0, 250), SPEED_RANGE_MIN, SPEED_RANGE_MAX);
+
+    // Out speed
+    if(DEBUG_CONTROLLER) {
+        Serial.print(pos);
+        Serial.print(" # ");
+        Serial.print(speed);
+        Serial.print("   ");
+
+        if(pos == 3) {
+            Serial.println("");
+        }
+    }
 
     // Write speed
-    motor->writeMicroseconds(speed);
+    //if(pos == 0 || pos == 2) {
+        motor->writeMicroseconds(speed);
+    //} else {
+    //    motor->writeMicroseconds(SPEED_MINIMAL);
+    //}
 }

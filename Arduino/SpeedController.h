@@ -19,7 +19,6 @@ class SpeedController {
     // Public
     public:
 
-        bool debugSpeed;
         bool killed = false, killedAlive = false;
 
         float pastX = 0, pastY = 0, pastZ = 0;  // Integral
@@ -57,8 +56,7 @@ class SpeedController {
  * @returns: void
  */
 SpeedController::SpeedController(int test) {
-    // Variables
-    debugSpeed = isDebug(DEBUG_CONTROLLER);
+
 }
 
 /*
@@ -111,18 +109,6 @@ void SpeedController::handle() {
 
     // Loop through motors
     for(int i = 0; i < 4; i++) {
-        // Debugging speed
-        if(debugSpeed) {
-            Serial.print(motorList[i].pos);
-            Serial.print(" # ");
-            Serial.print(motorList[i].nextSpeed);
-            Serial.print("   ");
-
-            if(motorList[i].pos == 3) {
-                Serial.println("");
-            }
-        }
-
         // Handle motor speed
         motorList[i].handle();
     }
@@ -193,14 +179,14 @@ void SpeedController::handleMovement() {
                 pointY(a);
                 break;
             case 'w':
-                pointX(-a);
-                pointY(-a);
+                pointX(0);
+                pointY(0);
                 break;
 
             // Backwards
             case 'S':
-                pointX(-a);
-                pointY(-a);
+                pointX(0);
+                pointY(0);
                 break;
             case 's':
                 pointX(a);
@@ -210,20 +196,20 @@ void SpeedController::handleMovement() {
             // Left
             case 'A':
                 pointX(a);
-                pointY(-a);
+                pointY(0);
                 break;
             case 'a':
-                pointX(-a);
+                pointX(0);
                 pointY(a);
                 break;
 
             // Right
             case 'D':
                 pointX(a);
-                pointY(-a);
+                pointY(0);
                 break;
             case 'd':
-                pointX(-a);
+                pointX(0);
                 pointY(a);
                 break;
         }
@@ -292,10 +278,10 @@ void SpeedController::handleBalance() {
     float x = gyro.roll;
     float y = gyro.pitch;
 
-    Serial.print("X: ");
+    /*Serial.print("X: ");
     Serial.print(setpointX);
     Serial.print(" Y:");
-    Serial.println(setpointY);
+    Serial.println(setpointY);*/
 
     // X Axis
     errorX = setpointX - x;
@@ -350,7 +336,7 @@ void SpeedController::pointX(float value) {
  */
 void SpeedController::pointY(float value) {
     // Save value
-    setpointY += value;
+    setpointY = value;
 
     // Reset past values
     pastY = 0; pastErrorY = 0;

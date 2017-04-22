@@ -103,6 +103,9 @@ void setup() {
  */
 int dead = 0;
 void loop() {
+    // Check if ready for launch
+
+
     // Save current time to calculate execution time
     loopStartTime = millis();
 
