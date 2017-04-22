@@ -70,12 +70,12 @@
 // ((0.66+0.73+0.68+0.73+0.67+0.63+0.73+0.64+0.69+0.70+0.61)/11)*2
 
 // PID Controller
-#define CONTROLLER_PID_P 0.8*0.5//0.8*0.7//0.2	// The PID Proportional value (Now)
-#define CONTROLLER_PID_I 0//0.90/2 //0//0 //1.358/2		// The PID Integral value (Past)
-#define CONTROLLER_PID_D 0.90/7.5 //0//1.358/8//0.15	// the PID Derivative value (Future)
+#define CONTROLLER_PID_P 0.8*0.5    // The PID Proportional value (Now)
+#define CONTROLLER_PID_I 0          // The PID Integral value (Past)
+#define CONTROLLER_PID_D 0.90/7.5   // the PID Derivative value (Future)
 
 // Gyroscope
-#define GYRO_CALIBRATE true	// Toggle the calibration of the gyroscope on launch.
+#define GYRO_CALIBRATE true	    // Toggle the calibration of the gyroscope on launch.
 #define GYRO_READINGS 1000		// The amount of gyroscope readings used for calibration (3ms in between).
 #define GYRO_UP_READINGS 250	// The amount of gyroscope readings used for axes calibration (3ms in between).
 
