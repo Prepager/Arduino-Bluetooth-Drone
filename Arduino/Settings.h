@@ -19,7 +19,7 @@
 
 // Controller
 #define MODULE_CONTROLLER true	// Toggle the setup and handling of the motors.
-#define MODULE_BALANCING false	// Toggle the PID balancing system.
+#define MODULE_BALANCING true	// Toggle the PID balancing system.
 #define MODULE_MOVEMENT true	// Toggle the movement based on bluetooth signals.
 
 

@@ -29,7 +29,7 @@ class SpeedController {
         float setpointX = 0, setpointY = 0;
         float pastErrorX = 0, pastErrorY = 0;
 
-        SpeedController(int test);
+        SpeedController(bool startKilled);
         void setup();
         
         void handle();
@@ -48,7 +48,10 @@ class SpeedController {
  *
  * @returns: void
  */
-SpeedController::SpeedController(int test) {
+SpeedController::SpeedController(bool startKilled) {
+    // Killed
+    klled = startKilled;
+
     // Debugging
     debugSetpoint = isDebug(DEBUG_SETPOINTS);
 }

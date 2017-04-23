@@ -34,7 +34,7 @@ extern MotorController motorList[4] = {
 
 // Speed Controller
 #include "SpeedController.h";
-extern SpeedController speedController(1);
+extern SpeedController speedController(false);
 
 /*
  * Function: setup
