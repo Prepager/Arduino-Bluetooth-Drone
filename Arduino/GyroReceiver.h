@@ -29,8 +29,9 @@ class GyroReceiver {
         float rotX, rotY, rotZ;
 
         float roll, pitch;
+        bool calibrateGyro;
 
-        GyroReceiver(int test);
+        GyroReceiver(bool shouldCalibrate);
 
         void setup();
         void calibrate();
@@ -55,7 +56,10 @@ class GyroReceiver {
  *
  * @returns: void
  */
-GyroReceiver::GyroReceiver(int test) {
+GyroReceiver::GyroReceiver(bool shouldCalibrate) {
+    // Calibrate
+    calibrateGyro = shouldCalibrate;
+
     // Debugging
     debugGyro = isDebug(DEBUG_GYRO);
     debugAccel = isDebug(DEBUG_ACCEL);
@@ -107,6 +111,17 @@ void GyroReceiver::setup() {
 
         // End transmission
         Wire.endTransmission();
+
+    // Calibrate gyroscope
+    if(calibrateGyro) {
+        // Send calibration warning
+        Serial.println("+ Gyro calibration starting in 2 seconds.");
+        delay(2000);
+
+        // Calibrate Gyro
+        calibrate();
+        Serial.println("+ Gyro calibrated.");
+    }
 
     // Calibrate axes readings
     for(int i = 0; i < GYRO_UP_READINGS; i++) {

@@ -12,14 +12,14 @@
 
 // Bluetooth
 #define MODULE_BLUETOOTH true	// Toggle the retrieval and processing of bluetooth signals.
-#define MOUDLE_DEADMAN false	// Toggle the dead man's switch preventing actions on disconnect.
+#define MOUDLE_DEADMAN true	// Toggle the dead man's switch preventing actions on disconnect.
 
 // Gyroscope
 #define MODULE_GYROSCOPE true	// Toggle the retrieval and processing of gyroscope readings used for balancing.
 
 // Controller
 #define MODULE_CONTROLLER true	// Toggle the setup and handling of the motors.
-#define MODULE_BALANCING true	// Toggle the PID balancing system.
+#define MODULE_BALANCING false	// Toggle the PID balancing system.
 #define MODULE_MOVEMENT true	// Toggle the movement based on bluetooth signals.
 
 
@@ -30,18 +30,22 @@
  */
 
 // General
-#define DEBUG true				// Toogle all debugging tools below and output general actions.
+#define DEBUG true              // Toogle all debugging tools below and output general actions.
+
+// Execution
+#define DEBUG_EXECUTION false   // Output the speed of the application.
 
 // Bluetooth
-#define DEBUG_BLUETOOTH true	// Output chars received from bluetooth app (Except X and Z).
+#define DEBUG_BLUETOOTH false	// Output chars received from bluetooth app (Except X and Z).
 
 // Gyroscope
-#define DEBUG_GYRO 	false 		// Output X, Y and Z gyroscope readings in Deg.
-#define DEBUG_ACCEL true 		// Output X, Y and Z accelerometer readings in G.
-#define DEBUG_AXES 	false		// Output Roll and Pitch in Deg.
+#define DEBUG_GYRO 	false       // Output X, Y and Z gyroscope readings in Deg.
+#define DEBUG_ACCEL false       // Output X, Y and Z accelerometer readings in G.
+#define DEBUG_AXES 	false       // Output Roll and Pitch in Deg.
 
 // Controller
-#define DEBUG_CONTROLLER false	// Output next speed for each motor in ms.
+#define DEBUG_CONTROLLER true   // Output next speed for each motor in ms.
+#define DEBUG_SETPOINTS false   // Output setpoint values for PID controller.
 
 
 /*
@@ -75,7 +79,7 @@
 #define CONTROLLER_PID_D 0.90/7.5   // the PID Derivative value (Future)
 
 // Gyroscope
-#define GYRO_CALIBRATE true	    // Toggle the calibration of the gyroscope on launch.
+#define GYRO_CALIBRATE false    // Toggle the calibration of the gyroscope on launch.
 #define GYRO_READINGS 1000		// The amount of gyroscope readings used for calibration (3ms in between).
 #define GYRO_UP_READINGS 250	// The amount of gyroscope readings used for axes calibration (3ms in between).
 
@@ -88,10 +92,10 @@
 #define SPEED_RANGE_MAX 1500	// The maximum speed for the motors.
 
 // Motors
-#define MOTOR_FL_OFFSET 0		// The offset in ms for the front left motor.
-#define MOTOR_FR_OFFSET 1		// The offset in ms for the front right motor.
-#define MOTOR_BR_OFFSET 12		// The offset in ms for the back right motor.
-#define MOTOR_BL_OFFSET 0		// The offset in ms for the back left motor.
+#define MOTOR_FL_OFFSET 1		// The offset in percent for the front left motor.
+#define MOTOR_FR_OFFSET 1		// The offset in percent for the front right motor.
+#define MOTOR_BR_OFFSET 1.01	// The offset in percent for the back right motor.
+#define MOTOR_BL_OFFSET 1		// The offset in percent for the back left motor.
 
 
 /*
@@ -103,6 +107,7 @@
 // Bluetooth
 #define BLUETOOTH_SETUP false	// Toggle the setup mode of the bluetooth module.
 #define BLUETOOTH_DEADMAN 3		// The required time between readings for dead man's switch.
+#define BLUETOOTH_SERIAL true   // Use USB serial as bluetooth signal
 
 // Math
 #define PI 3.1415926535			// The value of PI used for the PID controller (10 decimal places).

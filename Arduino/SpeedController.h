@@ -20,20 +20,14 @@ class SpeedController {
     public:
 
         bool killed = false, killedAlive = false;
+        bool debugSetpoint, debugSpeed;
 
-        float pastX = 0, pastY = 0, pastZ = 0;  // Integral
-        float futureX, futureY, futureZ;        // Derivative
-        float errorX, errorY, errorZ;           // Proportional
+        float pastX = 0, pastY = 0; // Integral
+        float futureX, futureY;     // Derivative
+        float errorX, errorY;       // Proportional
 
-        float setpointX = 0, setpointY = 0, setpointZ = 0;
-        float pastErrorX = 0, pastErrorY = 0, pastErrorZ = 0;
-
-        /*String movementMethod[4][2] = {
-            {"W", "A"},
-            {"W", "D"},
-            {"S", "A"},
-            {"S", "D"}
-        };*/
+        float setpointX = 0, setpointY = 0;
+        float pastErrorX = 0, pastErrorY = 0;
 
         SpeedController(int test);
         void setup();
@@ -44,7 +38,6 @@ class SpeedController {
 
         void pointX(float value);
         void pointY(float value);
-        //static void callback();
 
 };
 
@@ -56,7 +49,8 @@ class SpeedController {
  * @returns: void
  */
 SpeedController::SpeedController(int test) {
-
+    // Debugging
+    debugSetpoint = isDebug(DEBUG_SETPOINTS);
 }
 
 /*
@@ -67,26 +61,15 @@ SpeedController::SpeedController(int test) {
  * @returns: void
  */
 void SpeedController::setup() {
-    // Update base speed offsets
-    motorList[0].baseSpeed += MOTOR_FL_OFFSET;
-    motorList[1].baseSpeed += MOTOR_FR_OFFSET;
-    motorList[2].baseSpeed += MOTOR_BR_OFFSET;
-    motorList[3].baseSpeed += MOTOR_BL_OFFSET;
-
     // Setup motors
     for(int i = 0; i < 4; i++) {
         motorList[i].setup();
 
-        // Base speed without balancing
+        // Set base speed without balancing
         if(!MODULE_BALANCING) {
             motorList[i].nextSpeed = motorList[i].baseSpeed;
         }
     }
-
-    // Start timer one
-    /*Timer1.initialize(TIMER_DELAY);
-    Timer1.attachInterrupt(SpeedController::callback);
-    debug("+ TimerOne initialized.");*/
 }
 
 /*
@@ -122,147 +105,108 @@ void SpeedController::handle() {
  * @returns: void
  */
 void SpeedController::handleMovement() {
-    // Read bluetooth signal
-    float a = ANGLE_MOVEMENT;
-    float s = SPEED_MOVEMENT;
-    String c = String(bluetooth.command);
+    // Retrieve bluetooth signal
     char cmd = bluetooth.command;
 
-    // Dead man's mode
+    // Check Dead man's switch
     if(MOUDLE_DEADMAN) {
-        // Kill on lost connection
+        // Check for not alive and killed
         if(!killed && !bluetooth.isAlive()) {
             killed = true;
             killedAlive = true;
         }
 
-        // Toggle when connection open
-        if(killed && killedAlive && bluetooth.isAlive()) {
+        // Check for alive and killedAlive
+        if(killedAlive && bluetooth.isAlive()) {
             killed = false;
             killedAlive = false;
         }
     }
 
-    // Ignore non-movement related commands
-    if(c == "Z" || c == "X") {
+    // Skip non-movement related commands
+    if(cmd == 'Z' || cmd == 'X') {
         return;
     }
 
-    // Toggle kill mode
-    if(killed) {
+    // Check for killed and kill command
+    if(cmd == 'Q') {
+        killed = true;
+        killedAlive = false;
+    } else if(killed) {
         killed = false;
         killedAlive = false;
     }
 
-    // Check for kill command
-    if(c == "Q") {
-        killed = true;
-        killedAlive = false;
+    // Handle general speed movement
+    for(int i = 0; i < 4; i++) {
+        // Save current motor
+        MotorController *curMotor = &motorList[i];
+
+        // Handle UP/DOWN command
+        if(cmd == 'T' || cmd == 'g') {
+            // Increase speed
+            curMotor->baseSpeed += SPEED_MOVEMENT;
+            continue;
+        } else if(cmd == 't' || cmd == 'G') {
+            // Lower speed
+            curMotor->baseSpeed -= SPEED_MOVEMENT;
+            continue;
+        }
+
+        // Handle rotate commands
+        if(curMotor->pos == 0 || curMotor->pos == 2) {
+            // Check for left rotation
+            if(cmd == 'F') {
+                // Increase speed
+                curMotor->baseSpeed += SPEED_MOVEMENT;
+                continue;
+            } else if(cmd == 'f') {
+                // Lower speed
+                curMotor->baseSpeed -= SPEED_MOVEMENT;
+                continue;
+            }
+        } else if(curMotor->pos == 1 || curMotor->pos == 3) {
+            // Check for right rotation
+            if(cmd == 'H') {
+                // Increase speed
+                curMotor->baseSpeed += SPEED_MOVEMENT;
+                continue;
+            } else if(cmd == 'h') {
+                // Lower speed
+                curMotor->baseSpeed -= SPEED_MOVEMENT;
+                continue;
+            }
+        }
     }
 
-    // Loop through motors
-    for(int i = 0; i < 4; i++) {
-        // Check for up/down command
-        if(c == "T" || c == "g") {
-            motorList[i].baseSpeed = motorList[i].baseSpeed + SPEED_MOVEMENT;
-            break;
-        } else if(c == "t" || c == "G") {
-            motorList[i].baseSpeed = motorList[i].baseSpeed - SPEED_MOVEMENT;
-            break;
-        }
+    // Handle x setpoint
+    if(cmd == 's' || cmd == 'W' || cmd == 'A') {
+        pointX(-ANGLE_MOVEMENT);
+    } else if(cmd == 'S' || cmd == 'w' || cmd == 'a') {
+        pointX(ANGLE_MOVEMENT);
+    }
 
-        // Switch commands
-        switch(cmd) {
-            // Forward
-            case 'W':
-                pointX(a);
-                pointY(a);
-                break;
-            case 'w':
-                pointX(0);
-                pointY(0);
-                break;
+    // Handle y setpoint
+    if(cmd == 'w' || cmd == 'S' || cmd == 'D') {
+        pointY(ANGLE_MOVEMENT);
+    } else if(cmd == 'W' || cmd == 's' || cmd == 'd') {
+        pointY(-ANGLE_MOVEMENT);
+    }
 
-            // Backwards
-            case 'S':
-                pointX(0);
-                pointY(0);
-                break;
-            case 's':
-                pointX(a);
-                pointY(a);
-                break;
+    // Output setpoint values
+    if(debugSetpoint) {
+        // Output Title
+        Serial.print("Setpoint (deg) ");
 
-            // Left
-            case 'A':
-                pointX(a);
-                pointY(0);
-                break;
-            case 'a':
-                pointX(0);
-                pointY(a);
-                break;
+        // SetPoint X
+        Serial.print("X=");
+        if(setpointX >= 0) { Serial.print(" "); }
+        Serial.print(setpointX);
 
-            // Right
-            case 'D':
-                pointX(a);
-                pointY(0);
-                break;
-            case 'd':
-                pointX(0);
-                pointY(a);
-                break;
-        }
-
-        // Loop through commands
-        /*for(int k = 0; k < 3; k++) {
-            // Retrieve command from method
-            String cmd = movementMethod[i][k];
-
-            // Save inverted string case state
-            String cmdUpper = cmd;
-            cmd.toLowerCase();
-
-            // Check for command
-            if(c == cmd || c == cmdUpper) {
-                switch(i) {
-                    // Motor 0
-                    case 0:
-                        pastX = 0; pastErrorX = 0;
-
-                        if(c == cmd) { setpointX -= s; return; }
-                        setpointX += s;
-                        break;
-
-                    // Motor 1
-                    case 1:
-                        pastY = 0; pastErrorY = 0;
-
-                        if(c == cmd) { setpointY -= s; return; }
-                        setpointY += s;
-                        break;
-
-                    // Motor 2
-                    case 2:
-                        pastX = 0; pastErrorX = 0;
-
-                        if(c == cmd) { setpointX += s; return; }
-                        setpointX -= s;
-                        break;
-
-                    // Motor 3
-                    case 3:
-                        pastY = 0; pastErrorY = 0;
-
-                        if(c == cmd) { setpointY += s; return; }
-                        setpointY -= s;
-                        break;
-                }
-
-                break;
-            }
-        }*/
-
+        // SetPoint Y
+        Serial.print(" Y=");
+        if(setpointY >= 0) { Serial.print(" "); }
+        Serial.println(setpointY);
     }
 }
 
@@ -277,11 +221,6 @@ void SpeedController::handleBalance() {
     // Read gyro readings
     float x = gyro.roll;
     float y = gyro.pitch;
-
-    /*Serial.print("X: ");
-    Serial.print(setpointX);
-    Serial.print(" Y:");
-    Serial.println(setpointY);*/
 
     // X Axis
     errorX = setpointX - x;
@@ -336,38 +275,8 @@ void SpeedController::pointX(float value) {
  */
 void SpeedController::pointY(float value) {
     // Save value
-    setpointY = value;
+    setpointY += value;
 
     // Reset past values
     pastY = 0; pastErrorY = 0;
 }
-
-/*
- * Function: callback
- * ----------------------------
- * Handle the movement of the motors.
- *
- * @returns: void
- */
-/*extern int callbackTimer = 0;
-static void SpeedController::callback() {
-    // Loop through motors
-    for(int i = 0; i < 4; i++) {
-        // Handle motor speed
-        motorList[i].handleSpeed();
-
-        // Compare motor speed and timer
-        if(motorList[i].speed != 0 && (callbackTimer % motorList[i].speed) == 0) {
-            // Handle motor rotation
-            motorList[i].handleRotation();
-        }
-    }
-    
-    // Update callback timer
-    callbackTimer = callbackTimer + TIMER_DELAY;
-
-    // Check callback timer limits
-    if(callbackTimer >= TIMER_COUNT_MAX) {
-        callbackTimer = 0;
-    }
-}*/

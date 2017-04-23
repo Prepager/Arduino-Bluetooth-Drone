@@ -14,7 +14,7 @@ extern float executionTime = 0.01;
 
 // Gyro Receiver
 #include "GyroReceiver.h";
-extern GyroReceiver gyro(1);
+extern GyroReceiver gyro(GYRO_CALIBRATE);
 
 // Bluetooth Receiver
 #include "BluetoothReceiver.h";
@@ -64,17 +64,6 @@ void setup() {
         // Setup Gyro
         gyro.setup();
         debug("+ Gyro initialized.");
-
-        // Should calibrate
-        if(GYRO_CALIBRATE) {
-            // Send calibration warning
-            debug("+ Gyro calibration starting in 2 seconds.");
-            delay(2000);
-
-            // Calibrate Gyro
-            gyro.calibrate();
-            debug("+ Gyro calibrated.");
-        }
     }
 
     // Setup Speed Controller module
@@ -88,7 +77,7 @@ void setup() {
     debug("-- Setup Completed --");
     debug("");
 
-    delayCountdown(5000);
+    //delayCountdown(5000);
     delay("");
     debug("+ Ready for launch.");
     debug("");
@@ -101,26 +90,9 @@ void setup() {
  *
  * @returns: void
  */
-int dead = 0;
 void loop() {
-    // Check if ready for launch
-
-
     // Save current time to calculate execution time
     loopStartTime = millis();
-
-    // Temp kill switch
-    if(Serial.available()) {
-        dead = 1;
-    }
-
-    if(dead) {
-        for(int i = 0; i < 4; i++) {
-            motorList[i].motor->writeMicroseconds(SPEED_MINIMAL);
-        }
-
-        return;
-    }
 
     // Retrieve Gyro readings
     if(MODULE_GYROSCOPE) {
@@ -139,4 +111,9 @@ void loop() {
 
     // Save execution time and convert millis to seconds
     executionTime = (millis() - loopStartTime) * 0.001;
+
+    // Output speed
+    if(isDebug(DEBUG_EXECUTION)) {
+        Serial.println(executionTime);
+    }
 }

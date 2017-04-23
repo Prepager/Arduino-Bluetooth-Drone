@@ -37,15 +37,15 @@ extern void debug(String text) {
  */
 void delayCountdown(int time) {
 	if(DEBUG) {
-		// Loop
+		// Loop through reps
 		int reps = time/1000;
 		for(int i = 0; i < reps; i++) {
-			// Print
+			// Out time left
 			Serial.print("+ Starting in ");
 			Serial.print(reps-i);
 			Serial.println(" seconds.");
 
-			// Delay
+			// Delay 1 second
 			delay(1000);
 		}
 	} else {
