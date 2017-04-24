@@ -50,7 +50,7 @@ class SpeedController {
  */
 SpeedController::SpeedController(bool startKilled) {
     // Killed
-    klled = startKilled;
+    killed = startKilled;
 
     // Debugging
     debugSetpoint = isDebug(DEBUG_SETPOINTS);

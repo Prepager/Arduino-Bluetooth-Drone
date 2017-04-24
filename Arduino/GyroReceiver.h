@@ -278,11 +278,11 @@ void GyroReceiver::processAxes() {
     if(totalForce > 8192 && totalForce < 32768) {
         // Pitch
         float pitchAccel = atan2f(accelY, accelZ) * (180 / PI);
-        pitch = (pitch * 0.90) + (pitchAccel * 0.10);
+        pitch = (pitch * 0.97) + (pitchAccel * 0.03);
 
         // Roll
         float pitchRoll = atan2f(accelX, accelZ) * (180 / PI);
-        roll = (roll * 0.90) + (pitchRoll * 0.10);
+        roll = (roll * 0.97) + (pitchRoll * 0.03);
     }
 }
 
@@ -294,7 +294,7 @@ void GyroReceiver::processAxes() {
  * @returns: void
  */
 void GyroReceiver::calibrate() {
-    // Record 2000 readings
+    // Perform calibration readings
     for(int i = 0; i < GYRO_READINGS; i++) {
         // Retrieve raw gyro readings
         retrieveRawGyro(true);

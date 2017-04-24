@@ -77,7 +77,7 @@ void setup() {
     debug("-- Setup Completed --");
     debug("");
 
-    //delayCountdown(5000);
+    delayCountdown(5000);
     delay("");
     debug("+ Ready for launch.");
     debug("");

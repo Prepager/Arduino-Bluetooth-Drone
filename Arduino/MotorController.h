@@ -108,5 +108,9 @@ void MotorController::handle() {
     }
 
     // Write speed to motor
-    motor->writeMicroseconds(speed);
+    //if(pos == 0 || pos == 2) {
+        motor->writeMicroseconds(speed);
+    //} else {
+    //    motor->writeMicroseconds(SPEED_MINIMAL);
+    //}
 }
