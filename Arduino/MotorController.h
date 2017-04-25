@@ -62,12 +62,6 @@ void MotorController::setup() {
     motor = new Servo();
     motor->attach(pin);
     motor->writeMicroseconds(SPEED_MINIMAL);
-
-    // Make port 8 act as ground
-    pinMode(8, INPUT);
-
-    // Make port 12 act as 5V
-    pinMode(12, OUTPUT);
 }
 
 /*
@@ -78,9 +72,6 @@ void MotorController::setup() {
  * @returns: void
  */
 void MotorController::handle() {
-    // Write 5V to port 12
-    digitalWrite(12, HIGH);
-
     // Manage speed
     int speedSwitch = map(analogRead(0), 0, 1023, 0, 250);
     speed = constrain(nextSpeed+speedSwitch, SPEED_RANGE_MIN, SPEED_RANGE_MAX);
@@ -108,9 +99,5 @@ void MotorController::handle() {
     }
 
     // Write speed to motor
-    //if(pos == 0 || pos == 2) {
-        motor->writeMicroseconds(speed);
-    //} else {
-    //    motor->writeMicroseconds(SPEED_MINIMAL);
-    //}
+    motor->writeMicroseconds(speed);
 }
