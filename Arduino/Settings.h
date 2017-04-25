@@ -106,8 +106,8 @@
 
 // Bluetooth
 #define BLUETOOTH_SETUP false	// Toggle the setup mode of the bluetooth module.
-#define BLUETOOTH_DEADMAN 3		// The required time between readings for dead man's switch.
-#define BLUETOOTH_SERIAL true	// Use USB serial as bluetooth signal
+#define BLUETOOTH_DEADMAN 3	    // The required time between readings for dead man's switch.
+#define BLUETOOTH_SERIAL true   // Use USB serial as bluetooth signal
 
 // Math
 #define PI 3.1415926535			// The value of PI used for the PID controller (10 decimal places).
