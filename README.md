@@ -1,9 +1,6 @@
 # Arduino-Bluetooth-Drone
 Bluetooth drone created for a school project using Arduino Uno and an Android app.
-
-## Project under construction...
-The project is currently very much a work in progress.
-*It is expected to be finished on the 25th of April.*
+The project was finished with a somewhat unsatisfying end result because of PID-controller issues.
 
 ----
 ### Credits
